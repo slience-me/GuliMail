@@ -8,7 +8,7 @@
         <version>2.1.8.RELEASE</version>
         <relativePath/>
     </parent>
-    <groupId>cn.slienceme.gulimail</groupId>
+    <groupId>cn.slienceme.gulimall</groupId>
     <artifactId>gulimall-member</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>gulimall-member</name>
@@ -19,11 +19,15 @@
 	</properties>
     <dependencies>
         <dependency>
-            <groupId>cn.slienceme.gulimail</groupId>
+            <groupId>cn.slienceme.gulimall</groupId>
             <artifactId>gulimall-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-
+        <!--   外部调用    -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

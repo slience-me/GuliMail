@@ -1,10 +1,10 @@
-package cn.slienceme.gulimall.order;
+package cn.slienceme.gulimall.member;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class GulimailOrderApplicationTests {
+class GulimallMemberApplicationTests {
 
     @Test
     void contextLoads() {

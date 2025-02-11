@@ -9,7 +9,7 @@ spring:
       discovery:
         server-addr: 127.0.0.1:8848
   application:
-    name: gulimail-member
+    name: gulimall-member
 
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml  # classpath*表示不仅扫描自己的类路径，引用的jar包也扫描

@@ -2,8 +2,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>cn.slienceme.gulimail</groupId>
-        <artifactId>gulimail</artifactId>
+        <groupId>cn.slienceme.gulimall</groupId>
+        <artifactId>gulimall</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>gulimall-common</artifactId>
@@ -49,10 +49,15 @@
             <version>2.5</version>
             <scope>provided</scope>   <!-- 打包不用带 -->
         </dependency>
-
+        <!--  服务注册/发现      -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!--  配置中心来做配置管理    -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
     </dependencies>
     <dependencyManagement>

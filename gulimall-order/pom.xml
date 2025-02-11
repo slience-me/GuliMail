@@ -8,7 +8,7 @@
         <version>2.1.8.RELEASE</version>
         <relativePath/>
     </parent>
-    <groupId>cn.slienceme.gulimail</groupId>
+    <groupId>cn.slienceme.gullmail</groupId>
     <artifactId>gulimall-order</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>gulimall-order</name>
@@ -19,7 +19,7 @@
 	</properties>
     <dependencies>
         <dependency>
-            <groupId>cn.slienceme.gulimail</groupId>
+            <groupId>cn.slienceme.gulimall</groupId>
             <artifactId>gulimall-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

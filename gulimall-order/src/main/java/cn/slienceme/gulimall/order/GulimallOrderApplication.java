@@ -6,10 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @MapperScan("cn.slienceme.gulimall.order.dao")
 @SpringBootApplication
-public class GulimailOrderApplication {
+public class GulimallOrderApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GulimailOrderApplication.class, args);
+        SpringApplication.run(GulimallOrderApplication.class, args);
     }
 
 }
