@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<script>
+  // 数组中新增了map和reduce方法
+  // map: 映射，将数组中的每个元素映射成另一个值，最终生成一个新数组
+  let arr = [1, 2, 3, 4, 5];
+  let arr2 = arr.map(function (item) {
+    return item * 2;
+  });
+  // 箭头函数简写
+  // let arr2 = arr.map(item => item * 2);
+  console.log(arr2);
+
+  // reduce: 累加器，将数组中的每个元素累加起来，最终生成一个值，可以设置初始值
+  let arr3 = arr.reduce(function (prev, item) {
+    return prev + item;
+  }, 0);
+  // 箭头函数简写
+  // let arr3 = arr.reduce((prev, item) => prev + item, 0);
+  console.log(arr3);
+</script>
+</body>
+</html>

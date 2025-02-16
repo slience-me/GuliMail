@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<script>
+    // // 数组解构
+    // let arr = [1, 2, 3];
+    // // 传统写法
+    // // let a = arr[0];
+    // // let b = arr[1];
+    // // let c = arr[2];
+    // // console.log(a, b, c);
+    // // ES6 写法
+    // let [a, b, c] = arr;
+    // console.log(a, b, c);
+    //
+    // // 对象解构
+    // let person = {name: 'Tom', age: 18};
+    // // 传统写法
+    // // let name = person.name;
+    // // let age = person.age;
+    // // console.log(name, age);
+    // // ES6 写法
+    // let {name, age} = person;
+    // console.log(name, age);
+    // // 换名字
+    // let {name: myName, age: myAge} = person;
+    // console.log(myName, myAge);
+    //
+    // // 字符串扩展
+    // let str = 'hello.vue';
+    // console.log(str.startsWith('hello'));// true
+    // console.log(str.endsWith('vue'));// true
+    // console.log(str.includes('e'));// true
+
+    // 字符串模板
+    // 1、多行字符串
+    let ss = `<div>
+                    <span>hello</span>
+                </div>`;
+    console.log(ss);
+
+    // 2、字符串插入变量和表达式
+    let name = 'Tom';
+    let age = 18;
+    let info = `My name is ${name}, I'm ${age + 1}`;
+    console.log(info);
+
+    function fun(){
+        return 'have fun';
+    }
+
+    let info2 = `My name is ${name}, I'm ${age + 1}, I say ${fun()}`;
+</script>
+</body>
+</html>

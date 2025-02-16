@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        {{msg}} <br>
+        {{ sayHello() }}
+        <span v-html="msg"></span>
+        <br>
+        <span v-text="msg"></span>
+        <!-- 如何实现这种需求: 属性绑定-->
+        <a href="{{link}}">gogogo</a>
+    </div>
+
+    <script src="../node_modules/vue/dist/vue.js"></script>
+
+    <script>
+        new Vue({
+            el: "#app",
+            data: {
+                msg: "<h1>Hello</h1>",
+                link: "www.baidu.com"  // 这个时候就需要用到属性绑定
+            },
+            methods: {
+                sayHello() {
+                    return "Hello!"
+                }
+            }
+        })
+    </script>
+</body>
+</html>

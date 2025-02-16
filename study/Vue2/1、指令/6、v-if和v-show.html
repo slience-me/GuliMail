@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <!-- v-if和v-show的区别
+        v-if: 每次都会重新删除或创建元素 （性能消耗大） 条件为true时，所在的元素才会被渲染
+        v-show: 每次都是切换元素的display属性 （初始渲染消耗大） 条件为true时，元素会显示
+    -->
+    <div id="app">
+        <button @click="show = !show">切换</button>
+        <!-- 1、使用v-if显示 -->
+        <h1 v-if="show">hello world(if)</h1>
+        <!-- 2、使用v-show显示 -->
+        <h1 v-show="show">hello world(show)</h1>
+    </div>
+<script src="../node_modules/vue/dist/vue.js"></script>
+<script>
+    // 1. vue声明式渲染
+    let vm = new Vue({
+        el: '#app',
+        data: {
+            show: true
+        },
+        methods: {
+        }
+    })
+</script>
+</body>
+</html>

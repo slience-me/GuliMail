@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<!-- 双绑定（一般就是表单项） -->
+<!--  data改变 -> 页面改变  -->
+<!--  页面改变 -> data改变  -->
+
+    <div id="app">
+        精通的语言：
+        <input type="checkbox" v-model="language" value="JavaScript">JavaScript <br>
+        <input type="checkbox" v-model="language" value="Java">Java <br>
+        <input type="checkbox" v-model="language" value="C++">C++ <br>
+        <input type="checkbox" v-model="language" value="Python">Python <br>
+        <input type="checkbox" v-model="language" value="PHP">PHP <br>
+        选中了
+        <span>{{language}}</span>个语言
+    </div>
+
+    <script src="../node_modules/vue/dist/vue.js"></script>
+
+    <script>
+        new Vue({
+            el: "#app",
+            data: {
+                language: []
+            }
+        })
+</script>
+</body>
+</html>

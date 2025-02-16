@@ -1,0 +1,18 @@
+{
+  "name": "Vue2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@vue/cli-init": "^5.0.8",
+    "vue": "^2.7.16",
+    "webpack": "^5.97.1"
+  }
+}

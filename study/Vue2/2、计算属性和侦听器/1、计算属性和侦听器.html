@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+    <!-- 某些结果是基于之前数据实时计算出来的，我们可以利用计算属性。来完成 -->
+        <ul>
+            <li>西游记： 价格：{{ xyjPrice }}, 数量：<input type="number" v-model="xyjNum"></li>
+            <li>水浒传： 价格：{{ shzPrice }}, 数量：<input type="number" v-model="shzNum"></li>
+            <li>总价：{{ totalPrice }}</li>
+            <span style="color: red;">{{msg}}</span>
+        </ul>
+    </div>
+
+    <script src="../node_modules/vue/dist/vue.js"></script>
+
+    <script>
+        // watch: 监听一个属性值的变化，从而做出响应（异步操作）
+        new Vue({
+            el: "#app",
+            data: {
+                xyjPrice: 99.98,
+                shzPrice: 98.00,
+                xyjNum: 1,
+                shzNum: 1,
+                msg: ''
+            },
+            computed: {
+                 totalPrice() { // 计算属性会根据依赖自动缓存，提高性能
+                    return this.xyjPrice * this.xyjNum + this.shzPrice * this.shzNum
+                 }
+            },
+            watch: {
+              xyjNum(newValue, oldValue) {
+                // alert("newValue:"+newValue + "==>" + "newValue:"+oldValue);
+                if (newValue >= 3) {
+                  this.msg = '库存不足';
+                  this.xyjNum = 3;
+                } else {
+                  this.msg = '';
+                }
+              }
+            },
+            methods: {
+            }
+        })
+    </script>
+</body>
+</html>

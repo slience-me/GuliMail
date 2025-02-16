@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<script>
+    // // 1. 函数参数的默认值
+    //
+    // // 在ES6以前，我们无法给函数参数设置默认值，只能通过逻辑或运算符来达到目的
+    // function add(a, b) {
+    //     // 判断b是否为空，为空则给默认值1
+    //     b = b || 1;  // b = b ? b : 1;
+    //     return a + b;
+    // }
+    // console.log(add(1)); // 2
+    // console.log(add(1, 2)); // 3
+    // console.log(add(1, undefined)); // 2
+    // console.log(add(undefined, 2)); // NaN
+    //
+    // // 在ES6中，我们可以通过函数参数的默认值来设置参数的默认值
+    // function add2(a, b = 1) {
+    //     return a + b;
+    // }
+    // console.log(add2(1)); // 2
+    //
+    // // 2、 不定参数
+    // // 1. 使用...args来表示不定参数，args是一个数组
+    // function fun(...args) {
+    //     console.log(args.length);
+    // }
+    // fun(); // 0
+    // fun(1, 2, 3); // 3
+    //
+    // // 2. 如果不定参数不是函数的第一个参数，那么不定参数后面不能再跟其他参数
+    // // function add6(a, ...args, b) {
+    // //     console.log(a); // 1
+    // //     console.log(args); // 报错 SyntaxError: Rest parameter must be last formal parameter
+    // //     console.log(b); // 报错 SyntaxError: Rest parameter must be last formal parameter
+    // // }
+    // // add6(1, 2, 3, 4);
+    // // 3. 如果函数的参数有默认值，那么不定参数必须放在最后
+    // function add7(a, b, ...args) {
+    //     console.log(a); // 1
+    //     console.log(b); // 2
+    //     console.log(args); // [3, 4]
+    // }
+    // add7(1, 2, 3, 4);
+    //
+    //
+    // // 3. 箭头函数
+    // // 以前声明一个方法(单参数)
+    // var print = function (obj) {
+    //     console.log(obj);
+    // }
+    // print({ name: '张三' }); // { name: '张三' }
+    //
+    // // 箭头函数的声明
+    // var print_ = obj => console.log(obj);
+    // print_({ name: '张三' }); // { name: '张三' }
+    //
+    // // 以前声明一个方法(多参数)
+    // var add2 = function (a, b) {
+    //     return a + b;
+    // }
+    // console.log(add2(1, 2)); // 3
+    //
+    // // 箭头函数的声明
+    // var add3 = (a, b) => a + b;
+    // console.log(add3(1, 2)); // 3
+    //
+    // // 方法体内有多行代码
+    // // 传统
+    // var add4 = function (a, b) {
+    //     console.log(a + b);
+    //     return a + b;
+    // }
+    // // 箭头函数
+    // var add5 = (a, b) => {
+    //     console.log(a + b);
+    //     return a + b;
+    // }
+    // console.log(add5(1, 2)); // 3
+
+    const person = {
+        name: '张三',
+        age: 18,
+        language: ['java', 'js', 'css'],
+    }
+    // 传统
+    function hello() {
+        console.log('hello, ' + person.name);
+    }
+    // 箭头函数
+    var hello2 = (person) => console.log('hello, ' + person.name);
+    hello2(person); // hello, 张三
+
+    // 箭头函数+解构
+    var hello3 = ({ name }) => console.log('hello, ' + name);
+    hello3(person); // hello, 张三
+
+</script>
+</body>
+</html>

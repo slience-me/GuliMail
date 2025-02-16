@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-common/target" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-coupon/.mvn" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-gateway/.mvn" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-gateway/target" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-member/.mvn" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-order/.mvn" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-product/.mvn" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-product/target" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-ware/.mvn" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/renren-fast/target" />
+      <excludeFolder url="file://$MODULE_DIR$/renren-fast-vue/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/study/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/study/ES6/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/study/Vue2/.idea" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

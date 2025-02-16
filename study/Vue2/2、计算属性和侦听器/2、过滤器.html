@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!--  过滤器常用来处理文本格式化的操作。过滤器可以用在两个地方：双花括号插值和v-bind表达式  -->
+    <div id="app">
+        <ul>
+            <li v-for="user in userList" :key="user.id">
+                {{user.id}} - {{user.name}} - {{user.age}} - {{user.gender | gFilter}} - {{user.gender === 1 ? '男' : '女'}}
+
+            </li>
+        </ul>
+    </div>
+
+    <script src="../node_modules/vue/dist/vue.js"></script>
+
+    <script>
+        // 全局过滤器
+        Vue.filter('gFilter', function(value) {
+            return value === 1 ? '男~~~' : '女~~~'
+        })
+        new Vue({
+            el: "#app",
+            data: {
+                userList: [
+                    {id: 1, name: 'jack', age: 18, gender: 0},
+                    {id: 2, name: 'rose', age: 17, gender: 1}
+                ]
+            },
+            //局部过滤
+            filters: {
+                genderFilter(gender) {
+                    return gender === 1 ? '男' : '女'
+                }
+            }
+        })
+    </script>
+</body>
+</html>

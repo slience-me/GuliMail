@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<div id="app">
+    <button @click="random=Math.random()">切换</button>
+    <span>{{random}}</span>
+    <h1 v-if="random>=0.75">&gt;=0.75</h1>
+    <h1 v-else-if="random>=0.5">&gt;=0.5</h1>
+    <h1 v-else-if="random>=0.25">&gt;=0.25</h1>
+    <h1 v-else>&lt;0.25</h1>
+</div>
+<script src="../node_modules/vue/dist/vue.js"></script>
+<script>
+    // 1. vue声明式渲染
+    let vm = new Vue({
+        el: '#app',
+        data: {
+            random: null
+        },
+        methods: {
+        }
+    })
+</script>
+</body>
+</html>

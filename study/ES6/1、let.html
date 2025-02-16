@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // var 声明的变量往往会越域
+        // let 声明的变量有严格的局部作用域
+        {
+            var a = 1;
+            let b = 2;
+        }
+        // console.log(a); // 1
+        // console.log(b); // 报错 b is not defined
+
+        // var 可以声明多次
+        // let 只能声明一次
+        var m = 1;
+        var m = 2;
+        let n = 3;
+        // let n = 4; // 报错 n is already declared
+        console.log(m); // 2
+        console.log(n); // 报错 n is already declared
+
+        // var 会变量提升
+        // let 不会变量提升，但需要先声明后使用
+        console.log(x); // undefined
+        var x = 10;
+        console.log(y); // 报错 y is not defined
+        let y = 20;
+
+        // const
+        // 1. 声明之后不允许改变
+        // 2. 一旦声明必须初始化，不能留到以后赋值, 否则报错
+        const PI = 3.14;
+        PI = 3.1415926; // 报错 Assignment to constant variable.
+    </script>
+
+</body>
+</html>

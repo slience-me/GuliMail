@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+<!--  <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>-->
+  <script src="mock/jquery.min.js"></script>
+</head>
+<body>
+<script>
+  // 1、查出当前用户信息
+  // 2、按照当前用户查出来的ID查询他的课程
+  // 3、按照当前课程ID查询他的分数
+  // $.ajax({
+  //   url: 'mock/user.json',
+  //   success(data) { // 1、查出当前用户信息
+  //     console.log("查询用户: ", data)
+  //     $.ajax({
+  //       url: `mock/user_course_${data.id}.json`,
+  //       success(data) { // 2、按照当前用户查出来的ID查询他的课程
+  //         console.log("查询到课程: ", data)
+  //         $.ajax({
+  //           url: `mock/course_score_${data.id}.json`,
+  //           success(data) { // 3、按照当前课程ID查询他的分数
+  //             console.log("查询到分数: ", data)
+  //           },
+  //           error(error) {
+  //             console.log("出现错误: ", error)
+  //           }
+  //         })
+  //       },
+  //       error(error) {
+  //         console.log("出现错误: ", error)
+  //       }
+  //     })
+  //   },
+  //   error(error) {
+  //     console.log("出现错误: ", error)
+  //   }
+  // })
+
+
+  // Promise
+  // 1. Promise可以封装异步操作
+  // let p = new Promise((resolve, reject) => { // resolve和reject是两个函数
+  //   // 1. 异步操作
+  //   $.ajax({
+  //     url: 'mock/user.json',
+  //     success:function (data) { // 1、查出当前用户信息
+  //       console.log("查询用户: ", data)
+  //       resolve(data);
+  //     },
+  //     error:function (err) {
+  //       reject(err);
+  //     }
+  //   })
+  // });
+  // p.then((obj) => { // 成功
+  //   return new Promise((resolve, reject) => {
+  //     $.ajax({
+  //       url: `mock/user_course_${obj.id}.json`,
+  //       success:function (data) { // 1、查出当前用户信息
+  //         console.log("查询到课程: ", data)
+  //         resolve(data);
+  //       },
+  //       error:function (err) {
+  //         reject(err);
+  //       }
+  //     })
+  //   })
+  // }).then((data) => { // 成功
+  //   $.ajax({
+  //     url: `mock/course_score_${data.id}.json`,
+  //     success:function (data) { // 1、查出当前用户信息
+  //       console.log("查询到分数: ", data)
+  //     },
+  //     error:function (err) {
+  //       console.log("出现错误: ", err)
+  //     }
+  //   })
+  //
+  // }).catch((err) => { // 失败
+  //   console.log("出现错误: ", err)
+  // })
+
+  function get(url, data) {
+     return new Promise((resolve, reject) => {
+        $.ajax({
+          url: url,
+          data: data,
+          success: function (data) {
+            resolve(data);
+
+          },
+          error: function (err) {
+            reject(err);
+          }
+        });
+     });
+  }
+
+  get(`mock/user.json`)
+      .then((data) => {
+        console.log("用户查询成功: ", data)
+        return get(`mock/user_course_${data.id}.json`)
+      }).then((data) => {
+        console.log("课程查询成功: ", data)
+        return get(`mock/course_score_${data.id}.json`)
+      }).then((data) => {
+        console.log("课程成绩查询成功: ", data)
+      }).catch((err) => {
+        console.log("出现错误: ", err)
+      })
+
+
+</script>
+</body>
+</html>

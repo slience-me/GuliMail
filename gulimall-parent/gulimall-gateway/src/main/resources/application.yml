@@ -1,0 +1,26 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: test_route
+        uri: https://www.baidu.com
+        predicates:
+          - Query=url,baidu
+
+      - id: product_route
+        uri: lb://gulimall-product
+        predicates:
+          - Path=/api/product/**
+        filters:
+          - RewritePath=/api/(?<segment>.*),/$\{segment}
+
+      - id: admin_route
+        uri: lb://renren-fast
+        predicates:
+          - Path=/api/**
+        filters:
+          - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
+
+
+
+## 前端项目 统一带 /api前缀

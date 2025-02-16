@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://10.1.226.18:3306/gulimall_ums?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  application:
+    name: gulimall-member
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml  # classpath*表示不仅扫描自己的类路径，引用的jar包也扫描
+  global-config:
+    db-config:
+      id-type: auto
+
+server:
+  port: 8000
