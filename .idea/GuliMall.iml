@@ -18,6 +18,11 @@
       <excludeFolder url="file://$MODULE_DIR$/study/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/study/ES6/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/study/Vue2/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-coupon/target" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-member/target" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-third-party/.mvn" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-third-party/target" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-ware/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

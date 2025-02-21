@@ -7,7 +7,7 @@ import java.sql.Statement;
 public class DatabaseTest {
 
     // 数据库连接信息
-    private static final String DB_URL = "jdbc:mysql://10.1.226.18:3306/gulimall_pms?useSSL=false";
+    private static final String DB_URL = "jdbc:mysql://192.168.50.2:3306/gulimall_pms?useSSL=false";
     private static final String USER = "root";
     private static final String PASS = "123456";
 

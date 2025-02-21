@@ -20,6 +20,7 @@ import {
   MenuItem,
   MenuItemGroup,
   Input,
+  Image,
   InputNumber,
   Radio,
   RadioGroup,
@@ -78,6 +79,7 @@ import {
   Notification
 } from 'element-ui'
 
+Vue.use(Image)
 Vue.use(Pagination)
 Vue.use(Dialog)
 Vue.use(Autocomplete)

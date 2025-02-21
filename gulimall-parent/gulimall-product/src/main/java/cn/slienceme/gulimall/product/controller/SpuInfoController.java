@@ -3,6 +3,7 @@ package cn.slienceme.gulimall.product.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import cn.slienceme.gulimall.product.vo.SpuSaveVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,7 +15,6 @@ import cn.slienceme.gulimall.product.entity.SpuInfoEntity;
 import cn.slienceme.gulimall.product.service.SpuInfoService;
 import cn.slienceme.common.utils.PageUtils;
 import cn.slienceme.common.utils.R;
-
 
 
 /**
@@ -35,9 +35,9 @@ public class SpuInfoController {
      */
     @RequestMapping("/list")
     //@RequiresPermissions("product:spuinfo:list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = spuInfoService.queryPage(params);
-
+    public R list(@RequestParam Map<String, Object> params) {
+        // PageUtils page = spuInfoService.queryPage(params);
+        PageUtils page = spuInfoService.queryPageByCondition(params);
         return R.ok().put("page", page);
     }
 
@@ -47,8 +47,8 @@ public class SpuInfoController {
      */
     @RequestMapping("/info/{id}")
     //@RequiresPermissions("product:spuinfo:info")
-    public R info(@PathVariable("id") Long id){
-		SpuInfoEntity spuInfo = spuInfoService.getById(id);
+    public R info(@PathVariable("id") Long id) {
+        SpuInfoEntity spuInfo = spuInfoService.getById(id);
 
         return R.ok().put("spuInfo", spuInfo);
     }
@@ -58,9 +58,10 @@ public class SpuInfoController {
      */
     @RequestMapping("/save")
     //@RequiresPermissions("product:spuinfo:save")
-    public R save(@RequestBody SpuInfoEntity spuInfo){
-		spuInfoService.save(spuInfo);
-
+    //public R save(@RequestBody SpuInfoEntity spuInfo){
+    public R save(@RequestBody SpuSaveVo vo) {
+        // spuInfoService.save(spuInfo);
+        spuInfoService.saveSpuInfo(vo);
         return R.ok();
     }
 
@@ -69,8 +70,8 @@ public class SpuInfoController {
      */
     @RequestMapping("/update")
     //@RequiresPermissions("product:spuinfo:update")
-    public R update(@RequestBody SpuInfoEntity spuInfo){
-		spuInfoService.updateById(spuInfo);
+    public R update(@RequestBody SpuInfoEntity spuInfo) {
+        spuInfoService.updateById(spuInfo);
 
         return R.ok();
     }
@@ -80,8 +81,8 @@ public class SpuInfoController {
      */
     @RequestMapping("/delete")
     //@RequiresPermissions("product:spuinfo:delete")
-    public R delete(@RequestBody Long[] ids){
-		spuInfoService.removeByIds(Arrays.asList(ids));
+    public R delete(@RequestBody Long[] ids) {
+        spuInfoService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
     }
