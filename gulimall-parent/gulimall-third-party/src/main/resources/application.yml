@@ -15,10 +15,10 @@ spring:
 server:
   port: 30000
 
-alibaba:
-  cloud:
-    access-key:
-    secret-key:
-    oss:
-      bucket: slienceme
-      endpoint: oss-cn-beijing.aliyuncs.com
+#alibaba:
+#  cloud:
+#    access-key:
+#    secret-key:
+#    oss:
+#      bucket: slienceme
+#      endpoint: oss-cn-beijing.aliyuncs.com
