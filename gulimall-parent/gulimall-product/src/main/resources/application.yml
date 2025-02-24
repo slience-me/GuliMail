@@ -25,6 +25,12 @@
 logging:
   level:
     cn.slienceme.gulimall: debug
+
 #spring:
 #  jackson:
 #    date-format: yyyy-MM-dd HH:mm:ss
+
+# 开发期间
+spring:
+  thymeleaf:
+    cache: false

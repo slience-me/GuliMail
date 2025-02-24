@@ -26,10 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -241,6 +238,19 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), wrapper);
         PageUtils pageUtils = new PageUtils(page);
         return pageUtils;
+    }
+
+    /**
+     * 在指定的所有属性集合里面，挑出检索属性
+     * @param attrIds
+     * @return
+     */
+    @Override
+    public List<Long> selectSearchAttrsIds(List<Long> attrIds) {
+        /**
+         * SELECT attr_id FROM pms_attr WHERE attr_id IN (?) AND search_type = 1
+         */
+        return this.baseMapper.selectSearchAttrIds(attrIds);
     }
 
 }

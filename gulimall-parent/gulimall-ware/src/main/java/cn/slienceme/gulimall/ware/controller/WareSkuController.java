@@ -1,8 +1,10 @@
 package cn.slienceme.gulimall.ware.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import cn.slienceme.gulimall.ware.vo.SkuHasStockVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +31,14 @@ import cn.slienceme.common.utils.R;
 public class WareSkuController {
     @Autowired
     private WareSkuService wareSkuService;
+
+    @RequestMapping("/hasStock")
+    public R getSkuHasStock(@RequestBody List<Long> skuIds) {
+        List<SkuHasStockVo> skuHasStock = wareSkuService.getSkuHasStock(skuIds);
+        R ok = R.ok();
+        ok.setData(skuHasStock);
+        return ok;
+    }
 
     /**
      * 列表

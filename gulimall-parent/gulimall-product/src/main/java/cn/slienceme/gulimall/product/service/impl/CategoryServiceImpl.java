@@ -1,6 +1,7 @@
 package cn.slienceme.gulimall.product.service.impl;
 
 import cn.slienceme.gulimall.product.service.CategoryBrandRelationService;
+import cn.slienceme.gulimall.product.vo.Catalog2Vo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -111,6 +112,47 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     public void updateCascade(CategoryEntity category) {
         this.updateById(category);
         categoryBrandRelationService.updateCategory(category.getCatId(), category.getName());
+    }
+
+    @Override
+    public List<CategoryEntity> getLevel1Categories() {
+        return baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", 0));
+    }
+
+    @Override
+    public Map<String, List<Catalog2Vo>> getCategoryJson() {
+
+        // 1. 查询所有1级分类
+        List<CategoryEntity> level1Categorys = getLevel1Categories();
+
+        // 2. 封装数据
+        Map<String, List<Catalog2Vo>> parentCid = level1Categorys.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
+            // 每一个的一级分类，查到这个一级分类的二级分类
+            List<CategoryEntity> categoryEntities = baseMapper.selectList(
+                    new QueryWrapper<CategoryEntity>().eq("parent_cid", v.getCatId()));
+            List<Catalog2Vo> catalog2Vos = null;
+            if (categoryEntities != null) {
+                catalog2Vos = categoryEntities.stream().map(l2 -> {
+                    Catalog2Vo catalog2Vo = new Catalog2Vo(v.getCatId().toString(),
+                            null, l2.getCatId().toString(), l2.getName());
+                    // 查到这个二级分类的三级分类
+                    List<CategoryEntity> level3Catelog = baseMapper.selectList(
+                            new QueryWrapper<CategoryEntity>().eq("parent_cid", l2.getCatId()));
+                    if (level3Catelog != null) {
+                        List<Catalog2Vo.Catalog3Vo> catelog3VoList = level3Catelog.stream().map(l3 -> {
+                            Catalog2Vo.Catalog3Vo catelog3Vo = new Catalog2Vo.Catalog3Vo(l2.getCatId().toString(),
+                                    l3.getCatId().toString(), l3.getName());
+                            return catelog3Vo;
+                        }).collect(Collectors.toList());
+                        catalog2Vo.setCatalog3List(catelog3VoList);
+                    }
+
+                    return catalog2Vo;
+                }).collect(Collectors.toList());
+            }
+            return catalog2Vos;
+        }));
+        return parentCid;
     }
 
     //225,25,2

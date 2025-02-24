@@ -3,6 +3,7 @@ package cn.slienceme.gulimall.ware.dao;
 import cn.slienceme.gulimall.ware.entity.WareSkuEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 商品库存
@@ -15,4 +16,6 @@ import org.apache.ibatis.annotations.Mapper;
 public interface WareSkuDao extends BaseMapper<WareSkuEntity> {
 
     void addStock(Long skuId, Long wareId, Integer skuNum);
+
+    Long getSkuStock(@Param("skuId") Long skuId);
 }

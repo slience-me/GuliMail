@@ -1,5 +1,6 @@
 package cn.slienceme.gulimall.product.service;
 
+import cn.slienceme.gulimall.product.vo.Catalog2Vo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.slienceme.common.utils.PageUtils;
 import cn.slienceme.gulimall.product.entity.CategoryEntity;
@@ -31,5 +32,9 @@ public interface CategoryService extends IService<CategoryEntity> {
     Long[] findCatelogPath(Long catelogId);
 
     void updateCascade(CategoryEntity category);
+
+    List<CategoryEntity> getLevel1Categories();
+
+    Map<String, List<Catalog2Vo>> getCategoryJson();
 }
 

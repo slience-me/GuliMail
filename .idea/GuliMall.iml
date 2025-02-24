@@ -23,6 +23,10 @@
       <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-third-party/.mvn" />
       <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-third-party/target" />
       <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-ware/target" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-order/target" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-search/.mvn" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/gulimall-search/target" />
+      <excludeFolder url="file://$MODULE_DIR$/gulimall-parent/renren-generator/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

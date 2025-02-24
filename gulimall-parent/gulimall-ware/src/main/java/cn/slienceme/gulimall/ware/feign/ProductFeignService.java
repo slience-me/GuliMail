@@ -22,5 +22,5 @@ public interface ProductFeignService {
      * @return
      */
     @RequestMapping("/product/skuinfo/info/{skuId}")
-    public R info(@PathVariable("skuId") Long skuId);
+    R info(@PathVariable("skuId") Long skuId);
 }
