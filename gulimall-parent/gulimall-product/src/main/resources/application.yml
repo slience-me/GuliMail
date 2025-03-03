@@ -11,12 +11,19 @@ spring:
   application:
     name: gulimall-product
   thymeleaf:
-    cache: false
+    cache: true
   redis:
     host: 192.168.50.2
     port: 6379
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000  # 1小时 ms单位
+      use-key-prefix: true
+      cache-null-values: true  # 是否缓存空值  缓解缓存穿透
+      #key-prefix: CACHE_  # 缓存前缀 如果指定了前缀就用，没有指定就用缓存的名字作为前缀
 
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml  # classpath*表示不仅扫描自己的类路径，引用的jar包也扫描

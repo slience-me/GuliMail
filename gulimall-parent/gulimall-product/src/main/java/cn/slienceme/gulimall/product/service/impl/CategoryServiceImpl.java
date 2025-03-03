@@ -7,6 +7,10 @@ import com.alibaba.fastjson.TypeReference;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -124,6 +128,12 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      *
      * @param category
      */
+    /*@Caching(evict = {
+            @CacheEvict(value = {"category"}, key = "'getLevel1Categories'"),  // 失效模式的使用
+            @CacheEvict(value = {"category"}, key = "'getCategoryJson'")  // 失效模式的使用
+    })*/
+    @CacheEvict(value = {"category"}, allEntries = true) // 失效模式: 清空某个分区所有缓存数据
+    //@CachePut()  // 双写模式
     @Transactional
     @Override
     public void updateCascade(CategoryEntity category) {
@@ -134,10 +144,67 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         // redis.del();等待下次主动查询进行更新
     }
 
+    // 每一个缓存的数据我们都来指定要放到哪个分区
+    // 代表当前方法的结果需要缓存，如果缓存中有，方法不用调用。如果没有，会调用方法，最后将方法的结果缓存
+    // sync = true 代表缓存失效以后，自动同步，默认是false
+    @Cacheable(value = {"category"}, key = "#root.method.name", sync = true)
     @Override
     public List<CategoryEntity> getLevel1Categories() {
-        return baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", 0));
+        System.out.println("getLevel1Categories.....");
+        long l = System.currentTimeMillis();
+        List<CategoryEntity> categoryEntities = baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", 0));
+        System.out.println("消耗时间：" + (System.currentTimeMillis() - l));
+
+        return categoryEntities;
     }
+
+    /*
+    Spring-Cache的不足之处
+        1）、读模式
+            缓存穿透：查询一个null数据。解决方案：缓存空数据，可通过spring.cache.redis.cache-null-values=true
+            缓存击穿：大量并发进来同时查询一个正好过期的数据。解决方案：加锁 ? 默认是无加锁的;
+            使用sync = true来解决击穿问题
+            缓存雪崩：大量的key同时过期。解决：加随机时间。加上过期时间
+        2)、写模式：（缓存与数据库一致）
+            a、读写加锁。
+            b、引入Canal,感知到MySQL的更新去更新Redis
+            c 、读多写多，直接去数据库查询就行
+        3）、总结：
+            常规数据（读多写少，即时性，一致性要求不高的数据，完全可以使用Spring-Cache）
+            写模式(只要缓存的数据有过期时间就足够了)
+            特殊数据：特殊设计
+    */
+    @Cacheable(value = {"category"}, key = "#root.method.name", sync = true)  // sync = true 解决缓存击穿问题
+    @Override
+    public Map<String, List<Catalog2Vo>> getCategoryJson() {
+        List<CategoryEntity> selectList = baseMapper.selectList(null);
+        List<CategoryEntity> level1Categorys = getCategoryByParentCid(selectList, 0L);
+        Map<String, List<Catalog2Vo>> parentCid = level1Categorys.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
+            List<CategoryEntity> categoryEntities = baseMapper.selectList(
+                    new QueryWrapper<CategoryEntity>().eq("parent_cid", v.getCatId()));
+            List<Catalog2Vo> catalog2Vos = null;
+            if (categoryEntities != null) {
+                catalog2Vos = categoryEntities.stream().map(l2 -> {
+                    Catalog2Vo catalog2Vo = new Catalog2Vo(v.getCatId().toString(),
+                            null, l2.getCatId().toString(), l2.getName());
+                    List<CategoryEntity> level3Catelog = baseMapper.selectList(
+                            new QueryWrapper<CategoryEntity>().eq("parent_cid", l2.getCatId()));
+                    if (level3Catelog != null) {
+                        List<Catalog2Vo.Catalog3Vo> catelog3VoList = level3Catelog.stream().map(l3 -> {
+                            Catalog2Vo.Catalog3Vo catelog3Vo = new Catalog2Vo.Catalog3Vo(l2.getCatId().toString(),
+                                    l3.getCatId().toString(), l3.getName());
+                            return catelog3Vo;
+                        }).collect(Collectors.toList());
+                        catalog2Vo.setCatalog3List(catelog3VoList);
+                    }
+                    return catalog2Vo;
+                }).collect(Collectors.toList());
+            }
+            return catalog2Vos;
+        }));
+        return parentCid;
+    }
+
 
     // TODO 堆外内存溢出：OutofDirectMemoryError
     // 1)、spring2.0以后默认使用lettuce作为操作redis的客户端，它使用netty进行网络通信
@@ -145,8 +212,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     // // 3)、springboot2.0以后默认使用lettuce作为操作redis的客户端，如果需要使用jedis作为客户端，需要在配置文件中配置
     // 可以通过-Dio.netty.maxDirectMemory来设置netty的堆外内存大小，默认是64M，如果不够可以调大
     // 1) 升级lettuce客户端版本  2)切换使用jedis   3) 减少netty的线程数量
-    @Override
-    public Map<String, List<Catalog2Vo>> getCategoryJson() {
+    public Map<String, List<Catalog2Vo>> getCategoryJson2() {
 
         /**
          * 1. 空结果缓存：解决缓存穿透问题
@@ -175,6 +241,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      * 缓存数据一致性
      * 1. 双写模式
      * 2. 失效模式
+     *
      * @return
      */
     public Map<String, List<Catalog2Vo>> getCategoryJsonFromDBWithRedissonLock() {

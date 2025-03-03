@@ -1,4 +1,4 @@
-package cn.slienceme.gulimall.search.controlller;
+package cn.slienceme.gulimall.search.app;
 
 
 import cn.slienceme.common.exception.BizCodeEnume;
