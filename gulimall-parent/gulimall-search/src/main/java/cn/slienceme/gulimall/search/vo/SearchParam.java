@@ -37,9 +37,10 @@ public class SearchParam {
      * attrs=1_5寸:8寸&2_16G:32G
      */
     private List<String> attrs; //按照属性进行筛选
+
     private Integer pageNum = 1; //页码
 
-    //private String _queryString; //原生的所有查询条件
+    private String _queryString; //原生的所有查询条件
 
     //===========================以上是返回给页面的所有信息============================//
 

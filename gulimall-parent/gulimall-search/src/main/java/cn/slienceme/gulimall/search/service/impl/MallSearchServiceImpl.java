@@ -1,13 +1,18 @@
 package cn.slienceme.gulimall.search.service.impl;
 
 import cn.slienceme.common.to.es.SkuEsModel;
+import cn.slienceme.common.utils.R;
+import cn.slienceme.gulimall.search.feign.ProductFeignService;
 import cn.slienceme.gulimall.search.config.GulimallElasticSearchConfig;
 import cn.slienceme.gulimall.search.constant.EsConstant;
 import cn.slienceme.gulimall.search.service.MallSearchService;
+import cn.slienceme.gulimall.search.vo.AttrResponseVo;
+import cn.slienceme.gulimall.search.vo.BrandVo;
 import cn.slienceme.gulimall.search.vo.SearchParam;
 import cn.slienceme.gulimall.search.vo.SearchResult;
 import com.alibaba.fastjson.JSON;
-import org.apache.lucene.search.TotalHits;
+import com.alibaba.fastjson.TypeReference;
+import com.sun.jndi.toolkit.url.Uri;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -15,7 +20,6 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.nested.ParsedNested;
@@ -26,13 +30,17 @@ import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilde
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
-import org.elasticsearch.search.fetch.subphase.highlight.Highlighter;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.yaml.snakeyaml.util.UriEncoder;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,6 +50,9 @@ public class MallSearchServiceImpl implements MallSearchService {
 
     @Autowired
     private RestHighLevelClient client;
+
+    @Autowired
+    private ProductFeignService productFeignService;
 
     // es检索
     @Override
@@ -93,6 +104,7 @@ public class MallSearchServiceImpl implements MallSearchService {
         }
         result.setProducts(products);
 
+
         // 2. 封装当前查询到的所有属性信息
         ParsedNested attrAgg = response.getAggregations().get("attr_agg");
         ParsedLongTerms attrIdAgg = attrAgg.getAggregations().get("attr_id_agg");
@@ -100,7 +112,8 @@ public class MallSearchServiceImpl implements MallSearchService {
         for (Terms.Bucket bucket : attrIdAgg.getBuckets()) {
             SearchResult.AttrVo attrVo = new SearchResult.AttrVo();
             // 1. 得到属性的ID
-            attrVo.setAttrId(bucket.getKeyAsNumber().longValue());
+            long attrId = bucket.getKeyAsNumber().longValue();
+            attrVo.setAttrId(attrId);
             // 2. 得到属性的名字
             ParsedStringTerms attrNameAgg = bucket.getAggregations().get("attr_name_agg");
             attrVo.setAttrName(attrNameAgg.getBuckets().get(0).getKeyAsString());
@@ -152,7 +165,71 @@ public class MallSearchServiceImpl implements MallSearchService {
         int totalPages = (int) total % EsConstant.PRODUCT_PAGESIZE == 0 ? ((int) total / EsConstant.PRODUCT_PAGESIZE) : (((int) total / EsConstant.PRODUCT_PAGESIZE) + 1);
         result.setPageNum(params.getPageNum());
         result.setTotalPages(totalPages);
+        List<Integer> pageNavs = new ArrayList<>();
+        for (int i = 1; i <= totalPages; i++) {
+            pageNavs.add(i);
+        }
+        result.setPageNavs(pageNavs);
+
+        // 6. 构建面包屑导航功能
+        if (params.getAttrs() != null && params.getAttrs().size() > 0) {
+            List<SearchResult.NavVo> collect = params.getAttrs().stream().map(attr -> {
+                SearchResult.NavVo navVo = new SearchResult.NavVo();
+                // attrs=2_2寸:6寸
+                String[] s = attr.split("_");
+                navVo.setNavValue(s[1]);
+                R r = productFeignService.attrInfo(Long.parseLong(s[0]));
+                result.getAttrIds().add(Long.parseLong(s[0]));
+                if (r.getCode() == 0) {
+                    AttrResponseVo data = r.getData("attr", new TypeReference<AttrResponseVo>() {
+                    });
+                    navVo.setNavName(data.getAttrName());
+                } else {
+                    navVo.setNavName(s[0]);
+                }
+                // 跳转
+                String replace = getTargetUrl(params, attr, "attrs");
+                navVo.setLink("http://search.gulimall.com/list.html" + (replace.isEmpty() ? "" : "?" + replace));
+                return navVo;
+            }).collect(Collectors.toList());
+            result.setNavs(collect);
+        }
+
+        // 品牌 分类
+        if (params.getBrandId() != null && params.getBrandId().size() > 0) {
+            List<SearchResult.NavVo> navs = result.getNavs();
+            SearchResult.NavVo navVo = new SearchResult.NavVo();
+            navVo.setNavName("品牌");
+            // TODO: 远程查询所有品牌
+            R r = productFeignService.brandsInfos(params.getBrandId());
+            if (r.getCode() == 0) {
+                List<BrandVo> brand = r.getData("brand", new TypeReference<List<BrandVo>>() {
+                });
+                StringBuffer stringBuffer = new StringBuffer();
+                String replace="";
+                for (BrandVo brandVo : brand) {
+                    stringBuffer.append(brandVo.getName());
+                    replace = getTargetUrl(params, brandVo.getBrandId()+"", "brandId");
+                }
+                navVo.setNavValue(stringBuffer.toString());
+                navVo.setLink("http://search.gulimall.com/list.html" + (replace.isEmpty() ? "" : "?" + replace));
+            }
+            navs.add(navVo);
+        }
+        // TODO 不需要导航
         return result;
+    }
+
+    private static String getTargetUrl(SearchParam params, String value, String key) {
+        try {
+            URI encodeData = new URI(null, null, value, null);
+            return params.get_queryString().replace("&" + key + "=" + encodeData.toASCIIString(), "")
+                    .replace("attrs=" + value + "&", "")
+                    .replace("attrs=" + value, "");
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     /**
@@ -202,16 +279,21 @@ public class MallSearchServiceImpl implements MallSearchService {
         if (!StringUtils.isEmpty(params.getSkuPrice())) {
             RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("skuPrice");
             String[] s = params.getSkuPrice().split("_");
-            if (s.length == 2) {
-                rangeQuery.gte(s[0]).lte(s[1]);
-            }
             if (s.length == 1) {
                 if (params.getSkuPrice().startsWith("_")) {
-                    rangeQuery.lte(s[1]);
+                    rangeQuery.lte(Integer.parseInt(s[0]));
                 }
                 if (params.getSkuPrice().endsWith("_")) {
-                    rangeQuery.gte(s[0]);
+                    rangeQuery.gte(Integer.parseInt(s[0]));
+                    rangeQuery.lte(30000);
                 }
+            } else if (s.length == 2) {
+                rangeQuery.gte(s[0]).lte(s[1]);
+                //_6000会截取成["","6000"]
+                if (!s[0].isEmpty()) {
+                    rangeQuery.gte(Integer.parseInt(s[0]));
+                }
+                rangeQuery.lte(Integer.parseInt(s[1]));
             }
             boolQuery.filter(rangeQuery);
         }
@@ -236,7 +318,7 @@ public class MallSearchServiceImpl implements MallSearchService {
         if (!StringUtils.isEmpty(params.getKeyword())) {
             HighlightBuilder highlightBuilder = new HighlightBuilder();
             highlightBuilder.field("skuTitle");
-            highlightBuilder.preTags("<b style='color=red;'>");
+            highlightBuilder.preTags("<b style='color:red;'>");
             highlightBuilder.postTags("</b>");
             sourceBuilder.highlighter(highlightBuilder);
         }

@@ -75,7 +75,7 @@
     "fields": {
       "skuTitle": {}
     },
-    "pre_tags": "<b style='color=red;'>",
+    "pre_tags": "<b style='color:red;'>",
     "post_tags": "</b>"
   },
   "aggs": {
