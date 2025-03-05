@@ -1,5 +1,6 @@
 package cn.slienceme.gulimall.product.service;
 
+import cn.slienceme.gulimall.product.vo.SkuItemVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.slienceme.common.utils.PageUtils;
 import cn.slienceme.gulimall.product.entity.SkuInfoEntity;
@@ -23,5 +24,7 @@ public interface SkuInfoService extends IService<SkuInfoEntity> {
     PageUtils queryPageByCondition(Map<String, Object> params);
 
     List<SkuInfoEntity> getSkusBySpuId(Long spuId);
+
+    SkuItemVo item(Long skuId);
 }
 

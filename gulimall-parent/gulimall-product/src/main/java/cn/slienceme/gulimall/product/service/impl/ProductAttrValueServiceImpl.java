@@ -1,5 +1,7 @@
 package cn.slienceme.gulimall.product.service.impl;
 
+import cn.slienceme.gulimall.product.dao.AttrGroupDao;
+import cn.slienceme.gulimall.product.vo.SkuItemVo;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;

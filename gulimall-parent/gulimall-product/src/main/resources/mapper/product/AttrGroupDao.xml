@@ -3,7 +3,7 @@
 
 <mapper namespace="cn.slienceme.gulimall.product.dao.AttrGroupDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="cn.slienceme.gulimall.product.entity.AttrGroupEntity" id="attrGroupMap">
         <result property="attrGroupId" column="attr_group_id"/>
         <result property="attrGroupName" column="attr_group_name"/>
@@ -12,6 +12,28 @@
         <result property="icon" column="icon"/>
         <result property="catelogId" column="catelog_id"/>
     </resultMap>
+    <!-- 只要有嵌套属性 就需要自定义结果集 -->
+    <resultMap id="SpuItemAttrGroupVo" type="cn.slienceme.gulimall.product.vo.SpuItemAttrGroupVo">
+        <result property="groupName" column="groupName"/>
+        <collection property="attrs" ofType="cn.slienceme.gulimall.product.vo.SpuBaseAttrVo">
+            <result property="attrName" column="attrName"/>
+            <result property="attrValue" column="attrValue"/>
+        </collection>
+    </resultMap>
+
+    <select id="getAttrGroupWithAttrsBySpuId" resultMap="SpuItemAttrGroupVo">
+        SELECT ag.`attr_group_name` as groupName,
+               ag.`attr_group_id`,
+               aar.`attr_id`,
+               attr.`attr_name` as attrName,
+               pav.`attr_value` as attrValue
+        FROM `pms_attr_group` as ag
+                 LEFT JOIN `pms_attr_attrgroup_relation` as aar ON aar.`attr_group_id` = ag.`attr_group_id`
+                 LEFT JOIN `pms_attr` as attr ON aar.`attr_id` = attr.`attr_id`
+                 LEFT JOIN `pms_product_attr_value` as pav ON pav.`attr_id` = attr.`attr_id`
+        WHERE ag.`catelog_id` = #{catalogId}
+          AND pav.`spu_id` = #{spuId}
+    </select>
 
 
 </mapper>

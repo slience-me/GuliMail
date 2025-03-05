@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -771,7 +771,7 @@
             </div>
             <div class="JD_nav_logo" th:with="brandId=${param.brandId}">
                 <!--品牌-->
-                <div class="JD_nav_wrap"  th:if="${#strings.isEmpty(brandId)}">
+                <div class="JD_nav_wrap" th:if="${#strings.isEmpty(brandId)}">
                     <div class="sl_key">
                         <span><b>品牌：</b></span>
                     </div>
@@ -829,7 +829,8 @@
                     </div>
                 </div>
                 <!--属性-->
-                <div class="JD_pre" th:each="attr:${result.attrs}" th:if="${!#lists.contains(result.attrIds, attr.attrId)}">
+                <div class="JD_pre" th:each="attr:${result.attrs}"
+                     th:if="${!#lists.contains(result.attrIds, attr.attrId)}">
                     <div class="sl_key">
                         <span th:text="${attr.attrName}"></span>
                     </div>
@@ -1041,22 +1042,28 @@
                                th:class="${(!#strings.isEmpty(p) && #strings.startsWith(p, 'hotScore')) ? 'sort_a desc' : 'sort_a'}"
                                th:attr="style=${(#strings.isEmpty(p) || #strings.startsWith(p, 'hotScore')) ? 'color:#FFF;border-color:#e4393c;background:#e4393c;' : 'color:#333;border-color:#CCC;background:#FFF;'}"
                                sort="hotScore"
-                               href="#">综合排序 [[${(!#strings.isEmpty(p) && #strings.startsWith(p, 'hotScore') && #strings.endsWith(p, 'desc'))?'↓':'↑'}]]</a>
+                               href="#">综合排序 [[${(!#strings.isEmpty(p) && #strings.startsWith(p, 'hotScore') &&
+                                #strings.endsWith(p, 'desc'))?'↓':'↑'}]]</a>
                             <a class="sort_a"
                                th:class="${(!#strings.isEmpty(p) && #strings.startsWith(p, 'saleCount')) ? 'sort_a desc' : 'sort_a'}"
                                th:attr="style=${(!#strings.isEmpty(p) && #strings.startsWith(p, 'saleCount')) ? 'color:#FFF;border-color:#e4393c;background:#e4393c;' : 'color:#333;border-color:#CCC;background:#FFF;'}"
                                sort="saleCount"
-                               href="#">销量 [[${(!#strings.isEmpty(p) && #strings.startsWith(p, 'saleCount') && #strings.endsWith(p, 'desc'))?'↓':'↑'}]]</a>
+                               href="#">销量 [[${(!#strings.isEmpty(p) && #strings.startsWith(p, 'saleCount') &&
+                                #strings.endsWith(p, 'desc'))?'↓':'↑'}]]</a>
                             <a class="sort_a"
                                th:class="${(!#strings.isEmpty(p) && #strings.startsWith(p, 'skuPrice')) ? 'sort_a desc' : 'sort_a'}"
                                th:attr="style=${(!#strings.isEmpty(p) && #strings.startsWith(p, 'skuPrice')) ? 'color:#FFF;border-color:#e4393c;background:#e4393c;' : 'color:#333;border-color:#CCC;background:#FFF;'}"
                                sort="skuPrice"
-                               href="#">价格 [[${(!#strings.isEmpty(p) && #strings.startsWith(p, 'skuPrice') && #strings.endsWith(p, 'desc'))?'↓':'↑'}]]</a>
+                               href="#">价格 [[${(!#strings.isEmpty(p) && #strings.startsWith(p, 'skuPrice') &&
+                                #strings.endsWith(p, 'desc'))?'↓':'↑'}]]</a>
                             <a class="sort_a" href="#">评论分</a>
                             <a class="sort_a" href="#">上架时间</a>
 
-                            <input style="width: 100px;margin-left: 30px;" id="skuPriceFrom" type="number" th:value="${#strings.isEmpty(priceRange)?'':#strings.substringBefore(priceRange, '_')}"> -
-                            <input style="width: 100px;" id="skuPriceTo" type="number" th:value="${#strings.isEmpty(priceRange)?'':#strings.substringAfter(priceRange, '_')}">
+                            <input style="width: 100px;margin-left: 30px;" id="skuPriceFrom" type="number"
+                                   th:value="${#strings.isEmpty(priceRange)?'':#strings.substringBefore(priceRange, '_')}">
+                            -
+                            <input style="width: 100px;" id="skuPriceTo" type="number"
+                                   th:value="${#strings.isEmpty(priceRange)?'':#strings.substringAfter(priceRange, '_')}">
                             <button id="skuPriceSearchButton">确定</button>
                         </div>
                         <div class="filter_top_right">
@@ -1169,7 +1176,8 @@
                                 </li>
                                 <li>
                                     <a href="#" th:with="check=${param.hasStock}">
-                                        <input id="showHasStock" type="checkbox" th:checked="${#strings.equals(check,'1')}">
+                                        <input id="showHasStock" type="checkbox"
+                                               th:checked="${#strings.equals(check,'1')}">
                                         仅显示有货
                                     </a>
                                 </li>
@@ -1191,8 +1199,8 @@
                                 <a href="#">关注</a>
                             </div>
                             <p class="da">
-                                <a href="#"
-                                   title="购买AppleCare+，获得原厂2年整机保修(含电池)，和多达2次意外损坏的保修服务。购买勾选：保障服务、原厂保2年。">
+                                <a th:href="${'http://item.gulimall.com/'+ product.skuId + '.html'}" target="_blank"
+                                    title="购买AppleCare+，获得原厂2年整机保修(含电池)，和多达2次意外损坏的保修服务。购买勾选：保障服务、原厂保2年。">
                                     <img th:src="${product.skuImg}" class="dim">
                                 </a>
                             </p>
@@ -1917,7 +1925,7 @@
         searchProducts("keyword", $('#keyword_input').val());
     }
 
-    $("#skuPriceSearchButton").click(function (){
+    $("#skuPriceSearchButton").click(function () {
         // 拼接价格区间
         var from = $("#skuPriceFrom").val();
         var to = $("#skuPriceTo").val();
@@ -1931,7 +1939,7 @@
         console.log(replaceParamVal(location.href, "pageNum", pn, false))
     });
 
-    function changeStyle(ele){
+    function changeStyle(ele) {
         // 1. 当前被点击的
         // 改变样式
         $(".sort_a").css({"color": "#333", "border-color": "#CCC", "background": "#FFF"});
@@ -1939,26 +1947,27 @@
             let text = $(this).text().replace("↓", "").replace("↑", "");
             $(this).text(text)
         });
-        $(ele).css({"color":"#FFF", "border-color":"#e4393c", "background":"#e4393c"})
+        $(ele).css({"color": "#FFF", "border-color": "#e4393c", "background": "#e4393c"})
 
         // 改变升序降序
         $(ele).toggleClass("desc"); // 加上就是降序 ，反正升序
         if ($(ele).hasClass("desc")) {
             // 降序
             let text = $(ele).text().replace("↓", "").replace("↑", "");
-            $(ele).text(text+"↓");
+            $(ele).text(text + "↓");
         } else {
             // 升序
             let text = $(ele).text().replace("↓", "").replace("↑", "");
-            $(ele).text(text+"↑");
+            $(ele).text(text + "↑");
         }
     }
-    $("#showHasStock").change(function (){
-        if($(this).prop("checked")){
+
+    $("#showHasStock").change(function () {
+        if ($(this).prop("checked")) {
             location.href = replaceParamVal(location.href, "hasStock", 1);
-        }else {
+        } else {
             var re = eval('/(&hasStock=)([^&]*)/gi');
-            location.href = (location.href+"").replace(re, '');
+            location.href = (location.href + "").replace(re, '');
         }
         return false;
     })

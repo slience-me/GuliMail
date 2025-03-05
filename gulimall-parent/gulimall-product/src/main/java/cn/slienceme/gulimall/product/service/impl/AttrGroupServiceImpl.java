@@ -3,10 +3,13 @@ package cn.slienceme.gulimall.product.service.impl;
 import cn.slienceme.gulimall.product.entity.AttrEntity;
 import cn.slienceme.gulimall.product.service.AttrService;
 import cn.slienceme.gulimall.product.vo.AttrGroupWithAttrsVo;
+import cn.slienceme.gulimall.product.vo.SkuItemVo;
+import cn.slienceme.gulimall.product.vo.SpuItemAttrGroupVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -87,6 +90,15 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
         return collect;
 
+
+    }
+
+    @Override
+    public List<SpuItemAttrGroupVo> getAttrGroupWithAttrsBySpuId(Long spuId, Long catalogId) {
+
+        AttrGroupDao baseMapper = this.getBaseMapper();
+        List<SpuItemAttrGroupVo> data = baseMapper.getAttrGroupWithAttrsBySpuId(spuId, catalogId);
+        return data;
 
     }
 

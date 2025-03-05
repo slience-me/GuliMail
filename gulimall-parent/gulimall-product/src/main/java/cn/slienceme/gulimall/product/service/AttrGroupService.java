@@ -1,6 +1,8 @@
 package cn.slienceme.gulimall.product.service;
 
 import cn.slienceme.gulimall.product.vo.AttrGroupWithAttrsVo;
+import cn.slienceme.gulimall.product.vo.SkuItemVo;
+import cn.slienceme.gulimall.product.vo.SpuItemAttrGroupVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.slienceme.common.utils.PageUtils;
 import cn.slienceme.gulimall.product.entity.AttrGroupEntity;
@@ -23,5 +25,7 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
 
 
     List<AttrGroupWithAttrsVo> getAttrGroupWithAttrsByCatelogId(Long catelogId);
+
+    List<SpuItemAttrGroupVo> getAttrGroupWithAttrsBySpuId(Long spuId, Long catalogId);
 }
 

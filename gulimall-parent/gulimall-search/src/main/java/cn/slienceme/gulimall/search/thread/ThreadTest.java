@@ -3,9 +3,206 @@ package cn.slienceme.gulimall.search.thread;
 import java.util.concurrent.*;
 
 public class ThreadTest {
-    public static ExecutorService service = Executors.newFixedThreadPool(10);
+    public static ExecutorService executor = Executors.newFixedThreadPool(10);
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
+        System.out.println("main thread start");
+        /**
+         * ==============================================================================================
+         * 创建异步对象CompletableFuture
+         * runAsync 和 supplyAsync方法
+         * CompletableFuture 提供了四个静态方法来创建一个异步操作。
+         * public static CompletableFuture<Void> runAsync(Runnable runnable)
+         * public static CompletableFuture<Void> runAsync(Runnable runnable, Executor executor)
+         * public static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier)
+         * public static <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier, Executor executor)
+         *
+         * CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+         *             System.out.println("当前线程ID: " + Thread.currentThread().getId());
+         *             int i = 10 / 2;
+         *             System.out.println("运行结果: " + i);
+         *         }, executor);
+         *
+         * CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+         *             System.out.println("当前线程ID: " + Thread.currentThread().getId());
+         *             int i = 10 / 2;
+         *             System.out.println("运行结果: " + i);
+         *             return i;
+         *         }, executor);
+         *         System.out.println(future.get());
+         * ==============================================================================================
+         */
+
+        // 开启线程 完成后操作 异常后操作(==方法完成后的感知==)
+        /*CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+            System.out.println("当前线程ID: " + Thread.currentThread().getId());
+            int i = 10 / 2;
+            System.out.println("运行结果: " + i);
+            return i;
+        }, executor).whenComplete((result, exception) -> {  // 当异步任务执行完成以后，会回调这个方法
+            System.out.println("异步任务执行完成，结果是：" + result + "，异常是：" + exception);
+        }).exceptionally(throwable -> {
+            // 当异步任务执行过程中发生异常，会回调这个方法
+            return 10;
+         });*/
+
+        // 异步任务执行完成以后，还可以继续执行新的任务(==方法完成后的处理==)
+        /*CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+            System.out.println("当前线程ID: " + Thread.currentThread().getId());
+            int i = 10 / 0;
+            System.out.println("运行结果: " + i);
+            return i;
+        }, executor).handle((result, exception) -> {  // 当异步任务执行完成以后，会回调这个方法
+            // 优势： 如果上一个任务执行成功，则result为上一步任务的结果，如果上一个任务执行失败，则result为null，exception为异常对象
+            if(result != null) {
+                System.out.println(result * 2);
+                return 200;
+            } else {
+                System.out.println(exception.getMessage());
+                return 500;
+            }
+        });*/
+
+        /**
+         * ==============================================================================================
+         * 线程串行化
+         * 1) thenRun: 不能获取上一步的执行结果。1个任务执行完执行2，不关心1的结果，自己也没有返回值
+         * .thenRunAsync(() -> {
+         *             System.out.println("任务2启动了");
+         *         }, executor);
+         * 2) thenAcceptAsync: 可以获取上一步的执行结果，同时也可以返回当前任务的执行结果
+         * .thenAcceptAsync((result) -> {
+         *             System.out.println("任务2启动了" + result);
+         *         }, executor);
+         * 3) thenApplyAsync: 可以获取上一步的执行结果，同时也可以返回当前任务的执行结果
+         * .thenApplyAsync((result) -> {
+         *             System.out.println("任务2启动了" + result);
+         *             return result + 20;
+         *         }, executor);
+         */
+        /*CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+            System.out.println("当前线程ID: " + Thread.currentThread().getId());
+            int i = 10 / 2;
+            System.out.println("运行结果: " + i);
+            return i;
+        }, executor).thenApplyAsync((result) -> {
+            System.out.println("任务2启动了" + result);
+            return result + 20;
+        }, executor);
+        System.out.println(future.get());*/
+
+        /**
+         * ==============================================================================================
+         * 两个都完成
+         */
+        /*CompletableFuture<Integer> future01 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("任务1线程ID: " + Thread.currentThread().getId());
+            int i = 10 / 2;
+            System.out.println("任务1运行结束: " + i);
+            return i;
+        }, executor);
+        CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("任务2线程ID: " + Thread.currentThread().getId());
+            System.out.println("任务2运行结束: ");
+            return "hello";
+        }, executor);*/
+
+        // runAfterBothAsync不能感知前两个的结果
+        /*future01.runAfterBothAsync(future02, ()->{
+            System.out.println("任务1和任务2都完成了");
+        },executor);*/
+
+        // thenAcceptBothAsync可以感知前两个的结果  但是不返回数据
+        /*future01.thenAcceptBothAsync(future02, (f1, f2) -> {
+            System.out.println("任务1和任务2都完成了，并且感知到了结果" + f1 + " " + f2);
+        }, executor);*/
+
+        // thenCombineAsync可以感知前两个的结果，并且返回数据
+        /*CompletableFuture<Integer> future = future01.thenCombineAsync(future02, (f1, f2) -> {
+            System.out.println("任务1和任务2都完成了，并且感知到了结果" + f1 + " " + f2);
+            return 200;
+        }, executor);
+        System.out.println(future.get());
+        //==============================================================================================
+        */
+
+
+        /**
+         * 两个任务，只要有一个完成，我们就执行任务3
+         */
+        /*CompletableFuture<String> future01 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("任务1线程ID: " + Thread.currentThread().getId());
+            int i = 10 / 2;
+            System.out.println("任务1运行结束: " + i);
+            return "111";
+        }, executor);
+        CompletableFuture<String> future02 = CompletableFuture.supplyAsync(() -> {
+            System.out.println("任务2线程ID: " + Thread.currentThread().getId());
+            try {
+                Thread.sleep(3000);
+                System.out.println("任务2运行结束: ");
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return "hello";
+        }, executor);*/
+
+        // 两个任务，只要有一个完成，我们就执行任务3
+        // runAfterEitherAsync 不接收结果 不返回值
+        /*future01.runAfterEitherAsync(future02, ()-> {
+            System.out.println("任务3开始执行");
+        }, executor);*/
+
+        // acceptEitherAsync 感知结果 没有返回值
+        /*future01.acceptEitherAsync(future02, (res) -> {
+            System.out.println("任务3开始执行，result: " + res);
+        }, executor);*/
+
+        // applyToEitherAsync 感知结果 有返回值
+        /*CompletableFuture<String> stringCompletableFuture = future01.applyToEitherAsync(future02, (res) -> {
+            System.out.println("任务3开始执行，result: " + res);
+            return "1";
+        }, executor);
+        System.out.println(stringCompletableFuture);*/
+
+
+        CompletableFuture<String> futureImg = CompletableFuture.supplyAsync(() -> {
+            System.out.println("查询商品的图片信息");
+            return "hello";
+        }, executor);
+
+        CompletableFuture<String> futureAttr = CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(5000);
+                System.out.println("查询商品的属性信息");
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return "黑色256G";
+        }, executor);
+
+        CompletableFuture<String> futureDesc = CompletableFuture.supplyAsync(() -> {
+            System.out.println("查询商品的介绍");
+            return "华为";
+        }, executor);
+
+        // 阻塞式等待 不推荐
+        /*futureImg.get();futureAttr.get();futureDesc.get();*/
+        //CompletableFuture<Void> allOf = CompletableFuture.allOf(futureImg, futureAttr, futureDesc);
+        CompletableFuture<Object> anyOf = CompletableFuture.anyOf(futureImg, futureAttr, futureDesc);
+        anyOf.get(); // 阻塞式等待
+        //allOf.join();  join和get区别:
+        // join()方法在任务完成之后会返回一个null
+        // get()方法在任务完成之后会返回一个具体的结果值
+
+
+        System.out.println("main thread end");
+        System.out.println("main thread end: "+anyOf.get());
+        //System.out.println("main thread end"+futureImg.get()+futureAttr.get()+futureDesc.get());
+    }
+
+
+    public void thread(String[] args) throws ExecutionException, InterruptedException {
         System.out.println("main thread start");
         /**
          * 1) 继承Thread

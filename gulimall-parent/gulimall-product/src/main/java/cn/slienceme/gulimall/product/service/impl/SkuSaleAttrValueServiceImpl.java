@@ -1,6 +1,11 @@
 package cn.slienceme.gulimall.product.service.impl;
 
+import cn.slienceme.gulimall.product.vo.SkuItemSaleAttrVo;
+import cn.slienceme.gulimall.product.vo.SkuItemVo;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,6 +29,12 @@ public class SkuSaleAttrValueServiceImpl extends ServiceImpl<SkuSaleAttrValueDao
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<SkuItemSaleAttrVo> getSaleAttrsBySpuId(Long spuId) {
+        SkuSaleAttrValueDao dao = this.getBaseMapper();
+        return dao.getSaleAttrsBySpuId(spuId);
     }
 
 }
