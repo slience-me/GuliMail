@@ -61,5 +61,8 @@ spring:
           predicates:
             - Host=search.gulimall.com
 
-
+        - id: gulimall_auth_host_route
+          uri: lb://gulimall-auth-server
+          predicates:
+            - Host=auth.gulimall.com
 ## 前端项目 统一带 /api前缀

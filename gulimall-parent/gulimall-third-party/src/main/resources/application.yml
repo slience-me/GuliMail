@@ -15,6 +15,13 @@ spring:
 server:
   port: 30000
 
+sms:
+  host:
+  path:
+  appcode:
+  sms-sign-id:
+  template-id:
+
 #alibaba:
 #  cloud:
 #    access-key:

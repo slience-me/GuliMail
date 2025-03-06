@@ -1,5 +1,6 @@
 package cn.slienceme.gulimall.product.service.impl;
 
+import cn.slienceme.gulimall.product.config.MyThreadConfig;
 import cn.slienceme.gulimall.product.entity.SkuImagesEntity;
 import cn.slienceme.gulimall.product.entity.SpuInfoDescEntity;
 import cn.slienceme.gulimall.product.service.*;
@@ -13,6 +14,9 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -36,8 +40,8 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     private SpuInfoDescService spuInfoDescService;
     @Autowired
     private AttrGroupService attrGroupService;
-//    @Autowired
-//    private Product productFeignService;
+    @Autowired
+    private ThreadPoolExecutor executor;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -115,32 +119,50 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     }
 
     @Override
-    public SkuItemVo item(Long skuId) {
+    public SkuItemVo item(Long skuId) throws ExecutionException, InterruptedException {
         SkuItemVo skuItemVo = new SkuItemVo();
-        //1、sku基本信息的获取  pms_sku_info
-        SkuInfoEntity skuInfoEntity = this.getById(skuId);
-        skuItemVo.setInfo(skuInfoEntity);
-        Long spuId = skuInfoEntity.getSpuId();
-        Long catalogId = skuInfoEntity.getCatalogId();
+
+        CompletableFuture<SkuInfoEntity> infoFuture = CompletableFuture.supplyAsync(() -> {
+            //1、sku基本信息的获取  pms_sku_info
+            SkuInfoEntity info = this.getById(skuId);
+            skuItemVo.setInfo(info);
+            return info;
+        }, executor);
+
+        CompletableFuture<Void> saleAttrFuture = infoFuture.thenAcceptAsync((res) -> {
+            //3、获取spu的销售属性组合-> 依赖1 获取spuId
+            List<SkuItemSaleAttrVo> saleAttrVos = skuSaleAttrValueService.getSaleAttrsBySpuId(res.getSpuId());
+            skuItemVo.setSaleAttr(saleAttrVos);
+        }, executor);
+
+
+        CompletableFuture<Void> descFuture = infoFuture.thenAcceptAsync((res) -> {
+            //4、获取spu的介绍-> 依赖1 获取spuId
+            SpuInfoDescEntity spuInfoDescEntity = spuInfoDescService.getById(res.getSpuId());
+            skuItemVo.setDesc(spuInfoDescEntity);
+        }, executor);
+
+
+        CompletableFuture<Void> bashAttrFuture = infoFuture.thenAcceptAsync((res) -> {
+            //5、获取spu的规格参数信息-> 依赖1 获取spuId catalogId
+            List<SpuItemAttrGroupVo> spuItemAttrGroupVos = attrGroupService.getAttrGroupWithAttrsBySpuId(res.getSpuId(), res.getCatalogId());
+            skuItemVo.setGroupAttrs(spuItemAttrGroupVos);
+        }, executor);
+
+
+        CompletableFuture<Void> imagesFuture = CompletableFuture.runAsync(() -> {
+            //2、sku的图片信息    pms_sku_images
+            List<SkuImagesEntity> skuImagesEntities = skuImagesService.list(new QueryWrapper<SkuImagesEntity>().eq("sku_id", skuId));
+            skuItemVo.setImages(skuImagesEntities);
+        }, executor);
 
         // 判断是否有货
-//        Boolean hasStock = productFeignService.getHasStock(skuInfoEntity.getHasStock());
+        // Boolean hasStock = productFeignService.getHasStock(skuInfoEntity.getHasStock());
 
-        //2、sku的图片信息    pms_sku_images
-        List<SkuImagesEntity> skuImagesEntities = skuImagesService.list(new QueryWrapper<SkuImagesEntity>().eq("sku_id", skuId));
-        skuItemVo.setImages(skuImagesEntities);
 
-        //4、获取spu的介绍-> 依赖1 获取spuId
-        SpuInfoDescEntity byId = spuInfoDescService.getById(spuId);
-        skuItemVo.setDesc(byId);
+        // 等待所有任务都完成
+        CompletableFuture.allOf(saleAttrFuture, descFuture, bashAttrFuture, imagesFuture).get();
 
-        //3、获取spu的销售属性组合-> 依赖1 获取spuId
-        List<SkuItemSaleAttrVo> saleAttrVos = skuSaleAttrValueService.getSaleAttrsBySpuId(spuId);
-        skuItemVo.setSaleAttr(saleAttrVos);
-
-        //5、获取spu的规格参数信息-> 依赖1 获取spuId catalogId
-        List<SpuItemAttrGroupVo> spuItemAttrGroupVos = attrGroupService.getAttrGroupWithAttrsBySpuId(spuId, catalogId);
-        skuItemVo.setGroupAttrs(spuItemAttrGroupVos);
         //TODO 6、秒杀商品的优惠信息
 
         return skuItemVo;

@@ -31,6 +31,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!--属性提示工具-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!--redis  去掉lettuce-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -60,7 +67,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
-
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
