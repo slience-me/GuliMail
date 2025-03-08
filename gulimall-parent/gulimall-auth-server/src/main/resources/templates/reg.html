@@ -532,17 +532,22 @@ minor-latin;mso-fareast-font-family:宋体;color:red"><span lang="EN-US">《谷�
 </header>
 <section>
     <form action="/regist" method="post" class="one">
-        <div class="register-box">
+		<div class="tips" style="color:red;"
+			 th:text="${errors!=null?(#maps.containsKey(errors,'msg')?errors.msg:''):''}">
+		</div>
+		<div class="register-box">
             <label class="username_label">用 户 名
                 <input maxlength="20" name="userName" type="text" placeholder="您的用户名和登录名">
             </label>
-            <div class="tips" th:text="${errors!=null?(#maps.containsKey(errors,'userName')?errors.userName:''):''}"></div>
+            <div class="tips" style="color:red;"
+				 th:text="${errors!=null?(#maps.containsKey(errors,'userName')?errors.userName:''):''}"></div>
         </div>
         <div class="register-box">
             <label class="other_label">设 置 密 码
                 <input maxlength="20" name="password" type="password" placeholder="建议至少使用两种字符组合">
             </label>
-            <div class="tips" th:text="${errors!=null?(#maps.containsKey(errors,'password')?errors.password:''):''}"></div>
+            <div class="tips" style="color:red;"
+				 th:text="${errors!=null?(#maps.containsKey(errors,'password')?errors.password:''):''}"></div>
         </div>
         <div class="register-box">
             <label class="other_label">确 认 密 码
@@ -555,13 +560,15 @@ minor-latin;mso-fareast-font-family:宋体;color:red"><span lang="EN-US">《谷�
                 <span>中国 +86</span>
                 <input class="phone" name="phone" id="phontNum" maxlength="20" type="text" placeholder="建议使用常用手机">
             </label>
-            <div class="tips" th:text="${errors!=null?(#maps.containsKey(errors,'phone')?errors.phone:''):''}"></div>
+            <div class="tips" style="color:red;"
+				 th:text="${errors!=null?(#maps.containsKey(errors,'phone')?errors.phone:''):''}"></div>
         </div>
         <div class="register-box">
             <label class="other_label">验 证 码
                 <input maxlength="20"  name="code" type="text" placeholder="请输入验证码" class="caa">
             </label>
-			<div class="tips" th:text="${errors!=null?(#maps.containsKey(errors,'code')?errors.code:''):''}"></div>
+			<div class="tips" style="color:red;"
+				 th:text="${errors!=null?(#maps.containsKey(errors,'code')?errors.code:''):''}"></div>
 
             <a id="sendCode">发送验证码</a>
         </div>

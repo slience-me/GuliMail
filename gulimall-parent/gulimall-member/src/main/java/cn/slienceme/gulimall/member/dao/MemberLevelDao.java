@@ -6,12 +6,13 @@ import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 会员等级
- * 
+ *
  * @author slience_me
  * @email slienceme.cn@gmail.com
  * @date 2025-01-17 20:57:49
  */
 @Mapper
 public interface MemberLevelDao extends BaseMapper<MemberLevelEntity> {
-	
+
+    MemberLevelEntity getDefaultLevelId();
 }

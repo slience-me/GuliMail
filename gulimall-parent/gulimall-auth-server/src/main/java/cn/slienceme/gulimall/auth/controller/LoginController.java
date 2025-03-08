@@ -3,8 +3,11 @@ package cn.slienceme.gulimall.auth.controller;
 
 import cn.slienceme.common.constant.AuthServerConstant;
 import cn.slienceme.common.utils.R;
+import cn.slienceme.gulimall.auth.feign.MemberFeignService;
 import cn.slienceme.gulimall.auth.feign.ThirdPartFeignService;
+import cn.slienceme.gulimall.auth.vo.UserLoginVo;
 import cn.slienceme.gulimall.auth.vo.UserRegistVo;
+import com.alibaba.fastjson.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -32,9 +35,11 @@ public class LoginController {
     private ThirdPartFeignService thirdPartFeignService;
 
     @Autowired
-    private StringRedisTemplate redisTemplate;
+    private MemberFeignService memberFeignService;
+
     @Autowired
-    private View error;
+    private StringRedisTemplate redisTemplate;
+
 
     @ResponseBody
     @GetMapping("/sms/sendcode")
@@ -59,7 +64,7 @@ public class LoginController {
                 code + '_' + System.currentTimeMillis(),
                 10,
                 TimeUnit.MINUTES);
-        //thirdPartFeignService.sendSmsCode(phone, code);
+        thirdPartFeignService.sendSmsCode(phone, code);
         return R.ok();
     }
 
@@ -81,14 +86,21 @@ public class LoginController {
             redisTemplate.delete(AuthServerConstant.SMS_CODE_CACHE_PREFIX + vo.getPhone());
 
             //2.1.2 远程调用会员服务注册
-//            R r = memberFeignService.register(vo);
-//            if (r.getCode() == 0) {
-//                //调用成功，重定向登录页
-//                return "redirect:http://auth.gulimall.com/login.html";
-//            }else {
-//                //调用失败，返回注册页并显示错误信息
-//                return "redirect:http://auth.gulimall.com/reg.html";
-//            }
+            R r = memberFeignService.regist(vo);
+            if (r.getCode() == 0) {
+                Map<String, String> errors = new HashMap<>();
+                errors.put("msg", "注册成功");
+                //调用成功，重定向登录页
+                attributes.addFlashAttribute("errors", errors);
+                return "redirect:http://auth.gulimall.com/login.html";
+            }else {
+                //调用失败，返回注册页并显示错误信息
+                Map<String, String> errors = new HashMap<>();
+                errors.put("msg", r.getData("msg", new TypeReference<String>(){}));
+                //调用成功，重定向登录页
+                attributes.addFlashAttribute("errors", errors);
+                return "redirect:http://auth.gulimall.com/reg.html";
+            }
         }else {
             Map<String, String> errors = new HashMap<>();
             errors.put("code", "验证码错误");
@@ -96,10 +108,20 @@ public class LoginController {
             //2.2 验证码错误
             return "redirect:http://auth.gulimall.com/reg.html";
         }
+    }
 
-
-        // 注册成功
-        return "redirect:http://auth.gulimall.com/login.html";
+    @PostMapping("/login")
+    public String login(UserLoginVo vo, RedirectAttributes redirectAttributes) {
+        // 远程调用
+        R login = memberFeignService.login(vo);
+        if (login.getCode() == 0) {
+            return "redirect:http://gulimall.com";
+        } else {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("msg", login.getData("msg", new TypeReference<String>(){}));
+            redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:http://auth.gulimall.com/login.html";
+        }
     }
 
 }
