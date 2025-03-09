@@ -101,6 +101,11 @@
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <!--整合springsession 完成session共享问题-->
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>

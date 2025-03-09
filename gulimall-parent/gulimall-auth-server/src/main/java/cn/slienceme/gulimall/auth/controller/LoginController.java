@@ -3,6 +3,7 @@ package cn.slienceme.gulimall.auth.controller;
 
 import cn.slienceme.common.constant.AuthServerConstant;
 import cn.slienceme.common.utils.R;
+import cn.slienceme.common.vo.MemberRespVo;
 import cn.slienceme.gulimall.auth.feign.MemberFeignService;
 import cn.slienceme.gulimall.auth.feign.ThirdPartFeignService;
 import cn.slienceme.gulimall.auth.vo.UserLoginVo;
@@ -21,6 +22,7 @@ import cn.slienceme.common.exception.BizCodeEnume;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -110,11 +112,24 @@ public class LoginController {
         }
     }
 
+    @GetMapping("/login.html")
+    private String loginPage(HttpSession session) {
+        Object attribute = session.getAttribute(AuthServerConstant.LOGIN_USER);
+        if (attribute == null){
+            return "login";
+        } else {
+            return "redirect:http://gulimall.com";
+        }
+    }
+
     @PostMapping("/login")
-    public String login(UserLoginVo vo, RedirectAttributes redirectAttributes) {
+    public String login(UserLoginVo vo, RedirectAttributes redirectAttributes,
+                        HttpSession session) {
         // 远程调用
         R login = memberFeignService.login(vo);
         if (login.getCode() == 0) {
+            MemberRespVo data = login.getData("memberEntity", new TypeReference<MemberRespVo>() {});
+            session.setAttribute(AuthServerConstant.LOGIN_USER, data);
             return "redirect:http://gulimall.com";
         } else {
             Map<String, String> errors = new HashMap<>();

@@ -2,6 +2,8 @@ package cn.slienceme.gulimall.member.service;
 
 import cn.slienceme.gulimall.member.exception.PhoneExistException;
 import cn.slienceme.gulimall.member.exception.UsernameExistException;
+import cn.slienceme.gulimall.member.vo.GiteeUserVo;
+import cn.slienceme.gulimall.member.vo.GiteeVo;
 import cn.slienceme.gulimall.member.vo.MemberLoginVo;
 import cn.slienceme.gulimall.member.vo.MemberRegistVo;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -28,5 +30,7 @@ public interface MemberService extends IService<MemberEntity> {
     void checkUsernameUnique(String username) throws UsernameExistException;
 
     MemberEntity login(MemberLoginVo vo);
+
+    MemberEntity login(GiteeVo giteeVo);
 }
 

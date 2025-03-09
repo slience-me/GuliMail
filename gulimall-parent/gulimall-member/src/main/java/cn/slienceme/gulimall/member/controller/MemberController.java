@@ -7,9 +7,10 @@ import cn.slienceme.common.exception.BizCodeEnume;
 import cn.slienceme.gulimall.member.exception.PhoneExistException;
 import cn.slienceme.gulimall.member.exception.UsernameExistException;
 import cn.slienceme.gulimall.member.feign.CouponFeignService;
+import cn.slienceme.gulimall.member.vo.GiteeUserVo;
+import cn.slienceme.gulimall.member.vo.GiteeVo;
 import cn.slienceme.gulimall.member.vo.MemberLoginVo;
 import cn.slienceme.gulimall.member.vo.MemberRegistVo;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,6 +56,16 @@ public class MemberController {
         return R.ok().put("page", page);
     }
 
+    @PostMapping("/oauth2/gitee/login")
+    public R oauth2login(@RequestBody GiteeVo giteeVo){
+        MemberEntity login = memberService.login(giteeVo);
+        if (login == null){
+            return R.error(BizCodeEnume.LOGIN_ACCT_PASSWORD_EXCEPTION.getCode(),
+                    BizCodeEnume.LOGIN_ACCT_PASSWORD_EXCEPTION.getMsg());
+        }
+        return R.ok().put("memberEntity", login);
+    }
+
     @PostMapping("/login")
     public R login(@RequestBody MemberLoginVo vo){
         MemberEntity login = memberService.login(vo);
@@ -62,7 +73,7 @@ public class MemberController {
             return R.error(BizCodeEnume.LOGIN_ACCT_PASSWORD_EXCEPTION.getCode(),
                     BizCodeEnume.LOGIN_ACCT_PASSWORD_EXCEPTION.getMsg());
         }
-        return R.ok();
+        return R.ok().put("memberEntity", login);
     }
 
     @PostMapping("/regist")

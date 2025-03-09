@@ -4,11 +4,15 @@ import cn.slienceme.gulimall.member.dao.MemberLevelDao;
 import cn.slienceme.gulimall.member.entity.MemberLevelEntity;
 import cn.slienceme.gulimall.member.exception.PhoneExistException;
 import cn.slienceme.gulimall.member.exception.UsernameExistException;
+import cn.slienceme.gulimall.member.vo.GiteeUserVo;
+import cn.slienceme.gulimall.member.vo.GiteeVo;
 import cn.slienceme.gulimall.member.vo.MemberLoginVo;
 import cn.slienceme.gulimall.member.vo.MemberRegistVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -53,6 +57,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         checkUsernameUnique(registVo.getUserName());
 
         entity.setUsername(registVo.getUserName());
+        entity.setNickname(registVo.getUserName());
         entity.setMobile(registVo.getPhone());
 
         // 设置密码
@@ -101,9 +106,45 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
 
         boolean matches = passwordEncoder.matches(vo.getPassword(), memberEntity.getPassword());
         if (matches) {
+            System.out.println("账户密码登录成功"+memberEntity);
             return memberEntity;
         } else {
             return null;
+        }
+    }
+
+    @Override
+    public MemberEntity login(GiteeVo vo) {
+        MemberDao memberDao = this.baseMapper;
+
+        MemberEntity memberEntity = memberDao.selectOne(
+                new QueryWrapper<MemberEntity>().eq("social_uid", vo.getId()));
+        if (memberEntity != null){
+            // 登录成功
+            MemberEntity updateMember = new MemberEntity();
+            updateMember.setId(memberEntity.getId());
+            updateMember.setAccessToken(vo.getSocial_access_token());
+            updateMember.setExpiresIn(vo.getSocial_expires_in());
+            memberDao.updateById(updateMember);
+
+            memberEntity.setAccessToken(vo.getSocial_access_token());
+            memberEntity.setExpiresIn(vo.getSocial_expires_in());
+            // 密码匹配
+            return memberEntity;
+        } else {
+            // 注册
+            MemberLevelEntity levelEntity = memberLevelDao.getDefaultLevelId();
+            MemberEntity registerMember = new MemberEntity();
+            registerMember.setSocialUid(String.valueOf(vo.getId()));
+            registerMember.setNickname(vo.getName());
+            registerMember.setUsername(vo.getLogin());
+            registerMember.setCreateTime(new Date());
+            registerMember.setHeader(vo.getAvatar_url());
+            registerMember.setLevelId(levelEntity.getId());
+            registerMember.setAccessToken(vo.getSocial_access_token());
+            registerMember.setExpiresIn(vo.getSocial_expires_in());
+            memberDao.insert(registerMember);
+            return registerMember;
         }
     }
 }
