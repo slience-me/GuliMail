@@ -32,6 +32,11 @@ public class WareSkuController {
     @Autowired
     private WareSkuService wareSkuService;
 
+    @RequestMapping("/getSkuHasStocks")
+    public List<SkuHasStockVo> getSkuHasStocks(@RequestBody List<Long> ids) {
+        return wareSkuService.getSkuHasStocks(ids);
+    }
+
     @RequestMapping("/hasStock")
     public R getSkuHasStock(@RequestBody List<Long> skuIds) {
         List<SkuHasStockVo> skuHasStock = wareSkuService.getSkuHasStock(skuIds);

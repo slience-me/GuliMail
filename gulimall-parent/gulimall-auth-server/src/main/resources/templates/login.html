@@ -8,7 +8,7 @@
 </head>
 <body>
 <!--顶部logo-->
-<header>
+<header style="margin: 0 auto;">
     <a href="http://gulimall.com"><img src="/static/login/JD_img/logo.jpg"/></a>
     <p>欢迎登录</p>
     <div class="top-1">
@@ -16,7 +16,7 @@
     </div>
 </header>
 
-<div class="top-2">
+<div class="top-2" style="margin: 0 auto;">
     <div class="top-2a">
         <img src="/static/login/JD_img/4de5019d2404d347897dee637895d02b_11.png"/>
         <p>依据《网络安全法》，为保障您的账户安全和正常使用，请尽快完成手机号验证！新版《<span>谷粒商城隐私政策</span>》已上线，将更有利于保护您的个人隐私。
@@ -25,15 +25,17 @@
 </div>
 
 <!--大图-->
-<div class="top-3">
+<div class="top-3" style="margin: 0 auto;">
     <div class="img_1">
         <img src="/static/login/JD_img/5731485aN1134b4f0.png"/>
     </div>
     <div id="sign">
         <div class="si_top">
             <p>
-                <span>谷粒商城不会以任何理由要求您转账汇款，谨防诈骗。</span>
+                <span>谷粒商城不会以任何理由要求您转账汇款，谨防诈骗。</span><br>
+                <span style="color: red;" th:if="${session.msg!=null}">[[${session.msg}]]</span>
             </p>
+
         </div>
         <div class="si_cen">
             <h2 class="act btn1">扫码登录</h2>
@@ -114,7 +116,7 @@
 
 
 <!--底部-->
-<footer>
+<footer style="margin: 0 auto;">
     <ul>
         <li><a href="/static/login/#">关于我们</a></li>
         <li class="little">|</li>

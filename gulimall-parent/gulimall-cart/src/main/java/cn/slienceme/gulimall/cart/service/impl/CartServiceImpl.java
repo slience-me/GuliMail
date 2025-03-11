@@ -17,6 +17,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -137,13 +139,34 @@ public class CartServiceImpl implements CartService {
         BoundHashOperations<String, Object, Object> cartOps = getCartOps();
         CartItem cartItem = getCartItem(skuId);
         cartItem.setCount(num);
-        cartOps.put(skuId.toString(),JSON.toJSONString(cartItem));
+        cartOps.put(skuId.toString(), JSON.toJSONString(cartItem));
     }
 
     @Override
     public void deleteItem(Long skuId) {
         BoundHashOperations<String, Object, Object> ops = getCartOps();
         ops.delete(skuId.toString());
+    }
+
+    @Override
+    public List<CartItem> getUserCartItems() {
+        UserInfoTo userInfoTo = CartInterceptor.threadLocal.get();
+        if (userInfoTo.getUserId() == null) {
+            return null;
+        } else {
+            String cartKey = CART_PREFIX + userInfoTo.getUserId();
+            List<CartItem> cartItems = getCartItems(cartKey);
+            // 获取所有选中的购物项
+            List<CartItem> collect = cartItems
+                    .stream().filter(item -> item.getCheck())
+                    .map(item->{
+                        BigDecimal price = productFeignService.getPrice(item.getSkuId());
+                        // TODO: 更新最新价格 (循环远程调用 优化点)
+                        item.setPrice(price);
+                        return item;
+                    }).collect(Collectors.toList());
+            return collect;
+        }
     }
 
     private List<CartItem> getCartItems(String cartKey) {
@@ -160,19 +183,19 @@ public class CartServiceImpl implements CartService {
     }
 
     private BoundHashOperations<String, Object, Object> getCartOps() {
-    UserInfoTo userInfoTo = CartInterceptor.threadLocal.get();
-    // 1. 登录否？
-    String cartKey = "";
-    if (userInfoTo.getUserId() != null) {
-        // 2. 登录，存入redis
-        // gulimall:cart:1
-        cartKey = CART_PREFIX + userInfoTo.getUserId();
-    } else {
-        cartKey = CART_PREFIX + userInfoTo.getUserKey();
-    }
+        UserInfoTo userInfoTo = CartInterceptor.threadLocal.get();
+        // 1. 登录否？
+        String cartKey = "";
+        if (userInfoTo.getUserId() != null) {
+            // 2. 登录，存入redis
+            // gulimall:cart:1
+            cartKey = CART_PREFIX + userInfoTo.getUserId();
+        } else {
+            cartKey = CART_PREFIX + userInfoTo.getUserKey();
+        }
 
-    // 判断当前购物车
-    BoundHashOperations<String, Object, Object> operations = redisTemplate.boundHashOps(cartKey);
-    return operations;
-}
+        // 判断当前购物车
+        BoundHashOperations<String, Object, Object> operations = redisTemplate.boundHashOps(cartKey);
+        return operations;
+    }
 }

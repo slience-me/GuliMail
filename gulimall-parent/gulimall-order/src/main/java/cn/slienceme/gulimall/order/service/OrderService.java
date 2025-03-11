@@ -1,5 +1,6 @@
 package cn.slienceme.gulimall.order.service;
 
+import cn.slienceme.gulimall.order.vo.OrderConfirmVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import cn.slienceme.common.utils.PageUtils;
 import cn.slienceme.gulimall.order.entity.OrderEntity;
@@ -16,5 +17,7 @@ import java.util.Map;
 public interface OrderService extends IService<OrderEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    OrderConfirmVo confirmOrder();
 }
 

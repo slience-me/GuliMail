@@ -70,4 +70,11 @@ spring:
           uri: lb://gulimall-cart
           predicates:
             - Host=cart.gulimall.com
+
+        - id: gulimall_order_host_route
+          uri: lb://gulimall-order
+          predicates:
+            - Host=order.gulimall.com
+
+
 ## 前端项目 统一带 /api前缀

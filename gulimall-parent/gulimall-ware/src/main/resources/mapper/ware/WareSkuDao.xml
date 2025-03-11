@@ -23,4 +23,7 @@
         FROM `wms_ware_sku`
         WHERE sku_id = #{skuId}
     </select>
+    <select id="getTotalStock" resultType="java.lang.Integer">
+        SELECT SUM(stock-stock_locked) from wms_ware_sku where sku_id=#{id}
+    </select>
 </mapper>
