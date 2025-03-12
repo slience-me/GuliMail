@@ -4,7 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import cn.slienceme.common.exception.BizCodeEnume;
+import cn.slienceme.common.exception.NoStockException;
 import cn.slienceme.gulimall.ware.vo.SkuHasStockVo;
+import cn.slienceme.gulimall.ware.vo.WareSkuLockVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +34,16 @@ import cn.slienceme.common.utils.R;
 public class WareSkuController {
     @Autowired
     private WareSkuService wareSkuService;
+
+    @RequestMapping("/lock/order")
+    public R orderLockStock(@RequestBody WareSkuLockVo itemVos){
+        try {
+            List<WareSkuLockVo> stockResults =  wareSkuService.orderLockStock(itemVos);
+            return R.ok().setData(stockResults);
+        } catch (NoStockException e){
+            return R.error(BizCodeEnume.NO_STOCK_EXCEPTION.getCode(),BizCodeEnume.NO_STOCK_EXCEPTION.getMsg());
+        }
+    }
 
     @RequestMapping("/getSkuHasStocks")
     public List<SkuHasStockVo> getSkuHasStocks(@RequestBody List<Long> ids) {

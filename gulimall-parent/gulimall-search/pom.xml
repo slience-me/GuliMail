@@ -43,10 +43,11 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
         <!--引入devtools-->
-        <dependency>
+        <!--非开发状态先去除-->
+       <!-- <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
-        </dependency>
+        </dependency>-->
         <!--引入openfeign-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

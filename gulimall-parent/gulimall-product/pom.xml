@@ -24,12 +24,12 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
-        <!-- thymeleaf -->
-        <dependency>
+        <!--非开发状态先去除-->
+        <!--<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
-        </dependency>
+        </dependency>-->
 
         <!--属性提示工具-->
         <dependency>
