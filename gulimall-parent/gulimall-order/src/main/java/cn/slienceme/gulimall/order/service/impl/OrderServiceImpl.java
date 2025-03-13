@@ -1,9 +1,10 @@
 package cn.slienceme.gulimall.order.service.impl;
 
 import cn.slienceme.common.exception.NoStockException;
+import cn.slienceme.common.to.OrderTo;
 import cn.slienceme.common.utils.R;
 import cn.slienceme.common.vo.MemberRespVo;
-import cn.slienceme.gulimall.order.constant.OrderStatusEnum;
+import cn.slienceme.common.constant.OrderStatusEnum;
 import cn.slienceme.gulimall.order.entity.OrderItemEntity;
 import cn.slienceme.gulimall.order.feign.CartFeignService;
 import cn.slienceme.gulimall.order.feign.MemberFeignService;
@@ -14,6 +15,9 @@ import cn.slienceme.gulimall.order.service.OrderItemService;
 import cn.slienceme.gulimall.order.vo.*;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import io.seata.spring.annotation.GlobalTransactional;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -48,6 +52,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     private ThreadLocal<OrderSubmitVo> confirmVoThreadLocal = new ThreadLocal<>();
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     @Autowired
     CartFeignService cartFeignService;
     @Autowired
@@ -268,9 +274,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         order.setCreateTime(new Date());
         order.setModifyTime(new Date());
         this.save(order);
-        orderItemService.saveBatch(orderCreateTo.getOrderItems());
+        // seata不支持
+        // orderItemService.saveBatch(orderCreateTo.getOrderItems());
+        for (OrderItemEntity orderItem : orderCreateTo.getOrderItems()) {
+            orderItemService.save(orderItem); // 逐条插入
+        }
+
     }
 
+    @GlobalTransactional
     @Transactional
     @Override
     public SubmitOrderResponseVo submitOrder(OrderSubmitVo submitVo) {
@@ -313,8 +325,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                     responseVo.setOrder(order.getOrder());
                     responseVo.setCode(0);
 
+                    //发送消息到订单延迟队列，判断过期订单
+                    rabbitTemplate.convertAndSend("order-event-exchange", "order.create.order", order.getOrder());
                     // TODO: 远程扣减积分
-                    // pass
+                    //清除购物车记录
+                    /*BoundHashOperations<String, Object, Object> ops = redisTemplate.boundHashOps(CartConstant.CART_PREFIX + memberResponseVo.getId());
+                    for (OrderItemEntity orderItem : order.getOrderItems()) {
+                        ops.delete(orderItem.getSkuId().toString());
+                    }*/
                     return responseVo;
                 } else {
                     //5.1 锁定库存失败 事务回滚
@@ -326,6 +344,39 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 //验价失败
                 responseVo.setCode(2);
                 return responseVo;
+            }
+        }
+    }
+
+    @Override
+    public OrderEntity getOrderStatus(String orderSn) {
+        return this.getOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderSn));
+    }
+
+    /**
+     * 关闭过期的的订单
+     *
+     * @param orderEntity
+     */
+    @Override
+    public void closeOrder(OrderEntity orderEntity) {
+        //因为消息发送过来的订单已经是很久前的了，中间可能被改动，因此要查询最新的订单
+        OrderEntity newOrderEntity = this.getById(orderEntity.getId());
+        //如果订单还处于新创建的状态，说明超时未支付，进行关单
+        if (newOrderEntity.getStatus() == OrderStatusEnum.CREATE_NEW.getCode()) {
+            OrderEntity updateOrder = new OrderEntity();
+            updateOrder.setId(newOrderEntity.getId());
+            updateOrder.setStatus(OrderStatusEnum.CANCLED.getCode());
+            this.updateById(updateOrder);
+
+            //关单后发送消息通知其他服务进行关单相关的操作，如解锁库存
+            OrderTo orderTo = new OrderTo();
+            BeanUtils.copyProperties(newOrderEntity, orderTo);
+            try {
+                rabbitTemplate.convertAndSend("order-event-exchange", "order.release.other", orderTo);
+            }catch (Exception e){
+                //TODO 重发
+                log.error(e.getMessage());
             }
         }
     }

@@ -1,5 +1,6 @@
 package cn.slienceme.gulimall.ware.service;
-
+import cn.slienceme.common.to.OrderTo;
+import cn.slienceme.common.to.StockLockedTo;
 import cn.slienceme.gulimall.ware.vo.SkuHasStockVo;
 import cn.slienceme.gulimall.ware.vo.WareSkuLockVo;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -28,10 +29,8 @@ public interface WareSkuService extends IService<WareSkuEntity> {
 
     List<WareSkuLockVo> orderLockStock(WareSkuLockVo itemVos);
 
-//    Boolean orderLockStock(WareSkuLockVo lockVo);
+    void unlockStock(StockLockedTo to);
 
-//    void unlock(StockLockedTo stockLockedTo);
-//
-//    void unlock(OrderTo orderTo);
+    void unlockOrder(OrderTo orderTo);
 }
 

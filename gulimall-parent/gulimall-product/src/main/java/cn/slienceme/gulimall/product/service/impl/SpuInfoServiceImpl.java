@@ -12,6 +12,7 @@ import cn.slienceme.gulimall.product.feign.WareFeignService;
 import cn.slienceme.gulimall.product.service.*;
 import cn.slienceme.gulimall.product.vo.*;
 import com.alibaba.fastjson.TypeReference;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -87,6 +88,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
      *
      * @param vo
      */
+    @GlobalTransactional
     @Transactional
     @Override
     public void saveSpuInfo(SpuSaveVo vo) {

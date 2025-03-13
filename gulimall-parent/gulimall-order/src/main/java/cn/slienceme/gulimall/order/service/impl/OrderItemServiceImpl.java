@@ -2,7 +2,6 @@ package cn.slienceme.gulimall.order.service.impl;
 
 import cn.slienceme.gulimall.order.entity.OrderEntity;
 import cn.slienceme.gulimall.order.entity.OrderReturnReasonEntity;
-import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;

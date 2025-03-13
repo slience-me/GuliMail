@@ -32,14 +32,28 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
  *         OrderServiceImpl orderService = (OrderServiceImpl) AopContext.currentProxy();
  *         orderService.b();
  *         orderService.c();
- *
+ * Seata控制分布式事务
+ * 1) 每一个微服务先必须创建 undo_log 表
+ * 2) 安装事务协调器：seata-server：<a href="https://github.com/apache/incubator-seata/releases">seata-server</a>
+ * 3) 整合(这个部分我选择docker版本放到服务器了)
+ *      3.1 导入依赖 spring-cloud-starter-alibaba-seata 然后确认seata:all版本 当前是 0.7.1
+ *      3.2 解压并启动seata-server：
+ *          registry-conf: 注册中心相关； 修改 registry type=nacos
+ *          config: 配置中心相关； 修改 config type=nacos  或者直接使用file.conf
+ *      3.3 所有想要用到分布式事务的微服务使用seata DataSourceProxy代理自己的数据源
+ *      3.4 每个微服务，都必须导入
+ *          registry.conf
+ *          file.conf -> vgroup_mapping.{gulimall-ware改为应用名称}-fescar-service-group = "default"
+ *      3.5 启动测试分布式事务
+ *      3.6 给分布式大事务的入口标注@GlobalTransactional
+ *      3.7 每一个远程的小事务用@Transactional
  *
  */
-@EnableAspectJAutoProxy(exposeProxy = true)  // 开启基于注解的aop模式 开启暴露代理对象
+// @EnableAspectJAutoProxy(exposeProxy = true)  // 开启基于注解的aop模式 开启暴露代理对象
 @EnableRedisHttpSession
 @EnableDiscoveryClient
 @EnableFeignClients
-@EnableRabbit
+@EnableRabbit // 开启rabbitmq
 @SpringBootApplication
 public class GulimallOrderApplication {
 

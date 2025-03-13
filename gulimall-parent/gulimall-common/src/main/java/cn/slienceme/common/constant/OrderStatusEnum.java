@@ -1,4 +1,4 @@
-package cn.slienceme.gulimall.order.constant;
+package cn.slienceme.common.constant;
 
 public enum OrderStatusEnum {
 

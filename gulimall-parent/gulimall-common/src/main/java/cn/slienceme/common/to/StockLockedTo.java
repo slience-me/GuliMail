@@ -1,4 +1,4 @@
-package cn.slienceme.gulimall.ware.vo;
+package cn.slienceme.common.to;
 
 import lombok.Data;
 

@@ -43,8 +43,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
-
-
         <!--引入消息队列-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -55,6 +53,7 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
         </dependency>
+
         <!--redis-->
         <!--redis  去掉lettuce-->
         <dependency>
