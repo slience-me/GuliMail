@@ -14,7 +14,7 @@ import cn.slienceme.gulimall.coupon.entity.SeckillSessionEntity;
 import cn.slienceme.gulimall.coupon.service.SeckillSessionService;
 import cn.slienceme.common.utils.PageUtils;
 import cn.slienceme.common.utils.R;
-
+import java.util.List;
 
 
 /**
@@ -41,6 +41,11 @@ public class SeckillSessionController {
         return R.ok().put("page", page);
     }
 
+    @RequestMapping("/getSeckillSessionsIn3Days")
+    public R getSeckillSessionsIn3Days() {
+        List<SeckillSessionEntity> seckillSessionEntities=seckillSessionService.getSeckillSessionsIn3Days();
+        return R.ok().setData(seckillSessionEntities);
+    }
 
     /**
      * 信息

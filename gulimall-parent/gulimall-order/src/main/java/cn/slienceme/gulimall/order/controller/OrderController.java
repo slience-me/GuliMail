@@ -39,10 +39,14 @@ public class OrderController {
     //@RequiresPermissions("order:order:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = orderService.queryPage(params);
-
         return R.ok().put("page", page);
     }
 
+    @PostMapping("/listWithItem")
+    public R listWithItem(@RequestBody Map<String, Object> params){
+        PageUtils page = orderService.queryPageWithItem(params);
+        return R.ok().put("page", page);
+    }
 
     /**
      * 信息

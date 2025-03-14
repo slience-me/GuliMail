@@ -1,15 +1,18 @@
 package cn.slienceme.gulimall.coupon.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
 
 /**
  * 秒杀活动场次
- * 
+ *
  * @author slience_me
  * @email slienceme.cn@gmail.com
  * @date 2025-01-17 20:52:03
@@ -45,4 +48,6 @@ public class SeckillSessionEntity implements Serializable {
 	 */
 	private Date createTime;
 
+	@TableField(exist = false)
+	private List<SeckillSkuRelationEntity> relations;
 }

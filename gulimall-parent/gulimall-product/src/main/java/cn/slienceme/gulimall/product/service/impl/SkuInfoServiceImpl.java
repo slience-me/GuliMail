@@ -1,12 +1,16 @@
 package cn.slienceme.gulimall.product.service.impl;
 
+import cn.slienceme.common.utils.R;
 import cn.slienceme.gulimall.product.config.MyThreadConfig;
 import cn.slienceme.gulimall.product.entity.SkuImagesEntity;
 import cn.slienceme.gulimall.product.entity.SpuInfoDescEntity;
+import cn.slienceme.gulimall.product.feign.SeckillFeignService;
 import cn.slienceme.gulimall.product.service.*;
+import cn.slienceme.gulimall.product.vo.SeckillSkuVo;
 import cn.slienceme.gulimall.product.vo.SkuItemSaleAttrVo;
 import cn.slienceme.gulimall.product.vo.SkuItemVo;
 import cn.slienceme.gulimall.product.vo.SpuItemAttrGroupVo;
+import com.alibaba.fastjson.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,15 +37,17 @@ import org.springframework.util.StringUtils;
 public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> implements SkuInfoService {
 
     @Autowired
-    private SkuImagesService skuImagesService;
+    SkuImagesService skuImagesService;
     @Autowired
-    private SkuSaleAttrValueService skuSaleAttrValueService;
+    SkuSaleAttrValueService skuSaleAttrValueService;
     @Autowired
-    private SpuInfoDescService spuInfoDescService;
+    SpuInfoDescService spuInfoDescService;
     @Autowired
-    private AttrGroupService attrGroupService;
+    AttrGroupService attrGroupService;
     @Autowired
-    private ThreadPoolExecutor executor;
+    ThreadPoolExecutor executor;
+    @Autowired
+    SeckillFeignService seckillFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -159,9 +165,23 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         // 判断是否有货
         // Boolean hasStock = productFeignService.getHasStock(skuInfoEntity.getHasStock());
 
+        // 查询当前sku
+        //6、秒杀商品的优惠信息
+        CompletableFuture<Void> seckFuture = CompletableFuture.runAsync(() -> {
+            R r = seckillFeignService.getSeckillSkuInfo(skuId);
+            if (r.getCode() == 0) {
+                SeckillSkuVo seckillSkuVo = r.getData(new TypeReference<SeckillSkuVo>() {
+                });
+                long current = System.currentTimeMillis();
+                //如果返回结果不为空且活动未过期，设置秒杀信息
+                if (seckillSkuVo != null&&current<seckillSkuVo.getEndTime()) {
+                    skuItemVo.setSeckillSkuVo(seckillSkuVo);
+                }
+            }
+        }, executor);
 
         // 等待所有任务都完成
-        CompletableFuture.allOf(saleAttrFuture, descFuture, bashAttrFuture, imagesFuture).get();
+        CompletableFuture.allOf(saleAttrFuture, descFuture, bashAttrFuture, imagesFuture, seckFuture).get();
 
         //TODO 6、秒杀商品的优惠信息
 

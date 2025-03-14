@@ -2,16 +2,20 @@ package cn.slienceme.gulimall.order.service.impl;
 
 import cn.slienceme.common.exception.NoStockException;
 import cn.slienceme.common.to.OrderTo;
+import cn.slienceme.common.to.SeckillOrderTo;
 import cn.slienceme.common.utils.R;
 import cn.slienceme.common.vo.MemberRespVo;
 import cn.slienceme.common.constant.OrderStatusEnum;
+import cn.slienceme.gulimall.order.constant.PayConstant;
 import cn.slienceme.gulimall.order.entity.OrderItemEntity;
+import cn.slienceme.gulimall.order.entity.PaymentInfoEntity;
 import cn.slienceme.gulimall.order.feign.CartFeignService;
 import cn.slienceme.gulimall.order.feign.MemberFeignService;
 import cn.slienceme.gulimall.order.feign.ProductFeignService;
 import cn.slienceme.gulimall.order.feign.WareFeignService;
 import cn.slienceme.gulimall.order.interceptor.LoginUserInterceptor;
 import cn.slienceme.gulimall.order.service.OrderItemService;
+import cn.slienceme.gulimall.order.service.PaymentInfoService;
 import cn.slienceme.gulimall.order.vo.*;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
@@ -24,6 +28,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -68,6 +73,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     ProductFeignService productFeignService;
     @Autowired
     OrderItemService orderItemService;
+    @Autowired
+    PaymentInfoService paymentInfoService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -378,6 +385,91 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 //TODO 重发
                 log.error(e.getMessage());
             }
+        }
+    }
+
+    @Override
+    public PayVo getOrderPay(String orderSn) {
+        OrderEntity orderStatus = this.getOrderStatus(orderSn);
+        PayVo payVo = new PayVo();
+        payVo.setOut_trade_no(orderSn);
+        BigDecimal bigDecimal = orderStatus.getPayAmount().setScale(2, RoundingMode.UP);
+        payVo.setTotal_amount(bigDecimal.toString());
+        List<OrderItemEntity> order_sn = orderItemService.list(new QueryWrapper<OrderItemEntity>().eq("order_sn", orderSn));
+        payVo.setSubject(order_sn.get(0).getSkuName());
+        payVo.setBody("谷粒商城测试订单");
+        return payVo;
+    }
+
+    @Override
+    public PageUtils queryPageWithItem(Map<String, Object> params) {
+        MemberRespVo memberRespVo = LoginUserInterceptor.loginUser.get();
+
+        IPage<OrderEntity> page = this.page(
+                new Query<OrderEntity>().getPage(params),
+                new QueryWrapper<OrderEntity>().eq("member_id", memberRespVo.getId()).orderByDesc("id")
+        );
+
+        List<OrderEntity> orderList = page.getRecords().stream().map(order -> {
+            List<OrderItemEntity> orderItemEntityList = orderItemService.list(new QueryWrapper<OrderItemEntity>().eq("order_sn", order.getOrderSn()));
+            order.setItemsEntities(orderItemEntityList);
+            return order;
+        }).collect(Collectors.toList());
+        page.setRecords(orderList);
+
+        return new PageUtils(page);
+    }
+
+    @Override
+    public void handlerPayResult(PayAsyncVo payAsyncVo) {
+        //保存交易流水
+        PaymentInfoEntity infoEntity = new PaymentInfoEntity();
+        String orderSn = payAsyncVo.getOut_trade_no();
+        infoEntity.setOrderSn(orderSn);
+        infoEntity.setAlipayTradeNo(payAsyncVo.getTrade_no());
+        infoEntity.setSubject(payAsyncVo.getSubject());
+        String trade_status = payAsyncVo.getTrade_status();
+        infoEntity.setPaymentStatus(trade_status);
+        infoEntity.setCreateTime(new Date());
+        infoEntity.setCallbackTime(payAsyncVo.getNotify_time());
+        paymentInfoService.save(infoEntity);
+
+        //判断交易状态是否成功
+        if (trade_status.equals("TRADE_SUCCESS") || trade_status.equals("TRADE_FINISHED")) {
+            baseMapper.updateOrderStatus(orderSn, OrderStatusEnum.PAYED.getCode(), PayConstant.ALIPAY);
+        }
+    }
+
+    @Transactional
+    @Override
+    public void createSeckillOrder(SeckillOrderTo orderTo) {
+        MemberRespVo memberResponseVo = LoginUserInterceptor.loginUser.get();
+        //1. 创建订单
+        OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setOrderSn(orderTo.getOrderSn());
+        orderEntity.setMemberId(orderTo.getMemberId());
+        if (memberResponseVo!=null){
+            orderEntity.setMemberUsername(memberResponseVo.getUsername());
+        }
+        orderEntity.setStatus(OrderStatusEnum.CREATE_NEW.getCode());
+        orderEntity.setCreateTime(new Date());
+        orderEntity.setPayAmount(orderTo.getSeckillPrice().multiply(new BigDecimal(orderTo.getNum())));
+        this.save(orderEntity);
+        //2. 创建订单项
+        R r = productFeignService.info(orderTo.getSkuId());
+        if (r.getCode() == 0) {
+            SeckillSkuInfoVo skuInfo = r.getData("skuInfo", new TypeReference<SeckillSkuInfoVo>() {
+            });
+            OrderItemEntity orderItemEntity = new OrderItemEntity();
+            orderItemEntity.setOrderSn(orderTo.getOrderSn());
+            orderItemEntity.setSpuId(skuInfo.getSpuId());
+            orderItemEntity.setCategoryId(skuInfo.getCatalogId());
+            orderItemEntity.setSkuId(skuInfo.getSkuId());
+            orderItemEntity.setSkuName(skuInfo.getSkuName());
+            orderItemEntity.setSkuPic(skuInfo.getSkuDefaultImg());
+            orderItemEntity.setSkuPrice(skuInfo.getPrice());
+            orderItemEntity.setSkuQuantity(orderTo.getNum());
+            orderItemService.save(orderItemEntity);
         }
     }
 

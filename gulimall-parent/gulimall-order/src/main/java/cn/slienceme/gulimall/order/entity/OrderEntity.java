@@ -1,16 +1,19 @@
 package cn.slienceme.gulimall.order.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.math.BigDecimal;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
 
 /**
  * 订单
- * 
+ *
  * @author slience_me
  * @email slienceme.cn@gmail.com
  * @date 2025-01-17 21:08:41
@@ -189,5 +192,8 @@ public class OrderEntity implements Serializable {
 	 * 修改时间
 	 */
 	private Date modifyTime;
+
+	@TableField(exist = false)
+	private List<OrderItemEntity> itemsEntities;
 
 }

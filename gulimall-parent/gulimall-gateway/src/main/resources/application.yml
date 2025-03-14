@@ -12,7 +12,7 @@ spring:
         - id: coupon_route
           uri: lb://gulimall-coupon
           predicates:
-            - Path=/api/coupont/**
+            - Path=/api/coupon/**
           filters:
             - RewritePath=/api/(?<segment>.*),/$\{segment}
 
@@ -76,5 +76,13 @@ spring:
           predicates:
             - Host=order.gulimall.com
 
+        - id: gulimall_member_host_route
+          uri: lb://gulimall-member
+          predicates:
+            - Host=member.gulimall.com
 
+        - id: gulimall_seckill_host_route
+          uri: lb://gulimall-seckill
+          predicates:
+            - Host=seckill.gulimall.com
 ## 前端项目 统一带 /api前缀

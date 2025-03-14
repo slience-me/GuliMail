@@ -10,7 +10,9 @@ spring:
         server-addr: 192.168.50.3:8848
   application:
     name: gulimall-order
-
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
 
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml  # classpath*表示不仅扫描自己的类路径，引用的jar包也扫描

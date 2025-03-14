@@ -1,22 +1,25 @@
-#spring:
-#  datasource:
-#    username: root
-#    password: 123456
-#    url: jdbc:mysql://192.168.50.2:3306/gulimall_sms?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#  cloud:
-#    nacos:
-#      discovery:
-#        server-addr: 192.168.50.3:8848
-#  application:
-#    name: gulimall-coupon
-#
-#
-#mybatis-plus:
-#  mapper-locations: classpath*:/mapper/**/*.xml  # classpath*表示不仅扫描自己的类路径，引用的jar包也扫描
-#  global-config:
+spring:
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://192.168.50.2:3306/gulimall_sms?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.50.3:8848
+  application:
+    name: gulimall-coupon
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
 
-#    db-config:
-#      id-type: auto
-#server:
-#  port: 7000
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml  # classpath*表示不仅扫描自己的类路径，引用的jar包也扫描
+  global-config:
+
+    db-config:
+      id-type: auto
+server:
+  port: 7000

@@ -3,7 +3,7 @@
 
 <mapper namespace="cn.slienceme.gulimall.order.dao.OrderDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="cn.slienceme.gulimall.order.entity.OrderEntity" id="orderMap">
         <result property="id" column="id"/>
         <result property="memberId" column="member_id"/>
@@ -48,6 +48,12 @@
         <result property="commentTime" column="comment_time"/>
         <result property="modifyTime" column="modify_time"/>
     </resultMap>
+    <update id="updateOrderStatus">
+        update oms_order
+        set status=#{code},
+            pay_type=#{payType}
+        where order_sn = #{orderSn}
+    </update>
 
 
 </mapper>
