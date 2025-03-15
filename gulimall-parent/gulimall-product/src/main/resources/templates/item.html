@@ -507,10 +507,10 @@
 							<span th:text="${#numbers.formatDecimal(item.info.price,3,2)}">4499.00</span>
 						</li>
 						<li style="color: red;" th:if="item.seckillSkuVo!=null">
-							<span th:if="${#dates.createNow().getTime() < item.seckillSkuVo.startTime}">
-								商品将会在[[${#dates.format(new java.util.Date(item.seckillSkuVo.startTime), 'yyyy-MM-dd HH:mm:ss')}]]
+							<span th:if="${(item.seckillSkuVo!=null) && (#dates.createNow().getTime() < item.seckillSkuVo.startTime)}">
+								商品将会在[[${(item.seckillSkuVo!=null) && (#dates.format(new java.util.Date(item.seckillSkuVo.startTime), 'yyyy-MM-dd HH:mm:ss'))}]]
 							</span>
-							<span th:if="${(#dates.createNow().getTime() >= item.seckillSkuVo.startTime)&&(#dates.createNow().getTime() <= item.seckillSkuVo.endTime)}">
+							<span th:if="${(item.seckillSkuVo!=null) && (#dates.createNow().getTime() >= item.seckillSkuVo.startTime)&&(#dates.createNow().getTime() <= item.seckillSkuVo.endTime)}">
 								秒杀价：￥[[${#numbers.formatDecimal(item.seckillSkuVo.seckillPrice,1,2)}]]
 							</span>
 
@@ -633,7 +633,7 @@
 					</div>
 					<div class="box-btns-two"
 						 th:if="${item.seckillSkuVo == null}">
-						<a class="addToCart" href="http://cart.gulimall.com/addToCart" th:attr="skuId=${item.info.skuId}">
+						<a id="addToCart" href="http://cart.gulimall.com/addToCart" th:attr="skuId=${item.info.skuId}">
 							加入购物车
 						</a>
 					</div>

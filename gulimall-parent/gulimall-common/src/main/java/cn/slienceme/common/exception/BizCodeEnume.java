@@ -31,7 +31,8 @@ public enum BizCodeEnume {
     SECKILL_EXCEPTION(10005,"秒杀请求过多，请重新再试"),
     TOO_MANY_REQUEST_EXCEPTION(10004,"请求过多，请重新再试"),
     LOGIN_ACCT_PASSWORD_EXCEPTION(15003, "账号或密码错误"),
-    NO_STOCK_EXCEPTION(21001, "商品库存不足");
+    NO_STOCK_EXCEPTION(21001, "商品库存不足"),
+    READ_TIME_OUT_EXCEPTION(10005, "读取超时错误");
 
 
     private int code;

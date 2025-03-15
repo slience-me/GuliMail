@@ -3,6 +3,10 @@ package cn.slienceme.gulimall.seckill.service.impl;
 import cn.slienceme.common.to.SeckillOrderTo;
 import cn.slienceme.common.vo.MemberRespVo;
 import cn.slienceme.gulimall.seckill.service.SecKillService;
+import com.alibaba.csp.sentinel.Entry;
+import com.alibaba.csp.sentinel.SphU;
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
@@ -13,6 +17,7 @@ import cn.slienceme.gulimall.seckill.interceptor.LoginUserInterceptor;
 import cn.slienceme.gulimall.seckill.to.SeckillSkuRedisTo;
 import cn.slienceme.gulimall.seckill.vo.SeckillSessionWithSkusVo;
 import cn.slienceme.gulimall.seckill.vo.SkuInfoVo;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -30,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service("SecKillService")
 public class SecKillServiceImpl implements SecKillService {
 
@@ -67,31 +73,43 @@ public class SecKillServiceImpl implements SecKillService {
             List<SeckillSessionWithSkusVo> sessions = r.getData(new TypeReference<List<SeckillSessionWithSkusVo>>() {
             });
             //在redis中分别保存秒杀场次信息和场次对应的秒杀商品信息
+            System.out.println("sessions = " + sessions);
             saveSecKillSession(sessions);
             saveSecKillSku(sessions);
         }
     }
 
+    public List<SeckillSkuRedisTo> blockHandler(BlockException e) {
+        log.error("blockHandler降级了");
+        return null;
+    }
+
+    @SentinelResource(value = "getCurrentSeckillSkusResource", blockHandler = "blockHandler")
     @Override
     public List<SeckillSkuRedisTo> getCurrentSeckillSkus() {
-        Set<String> keys = redisTemplate.keys(SESSION_CACHE_PREFIX + "*");
-        long currentTime = System.currentTimeMillis();
-        for (String key : keys) {
-            String replace = key.replace(SESSION_CACHE_PREFIX, "");
-            String[] split = replace.split("_");
-            long startTime = Long.parseLong(split[0]);
-            long endTime = Long.parseLong(split[1]);
-            //当前秒杀活动处于有效期内
-            if (currentTime > startTime && currentTime < endTime) {
-                List<String> range = redisTemplate.opsForList().range(key, -100, 100);
-                BoundHashOperations<String, Object, Object> ops = redisTemplate.boundHashOps(SECKILL_CHARE_PREFIX);
-                List<SeckillSkuRedisTo> collect = range.stream().map(s -> {
-                    String json = (String) ops.get(s);
-                    SeckillSkuRedisTo redisTo = JSON.parseObject(json, SeckillSkuRedisTo.class);
-                    return redisTo;
-                }).collect(Collectors.toList());
-                return collect;
+        try(Entry entry = SphU.entry("SeckillSkus")) {
+            Set<String> keys = redisTemplate.keys(SESSION_CACHE_PREFIX + "*");
+            long currentTime = System.currentTimeMillis();
+            for (String key : keys) {
+                String replace = key.replace(SESSION_CACHE_PREFIX, "");
+                String[] split = replace.split("_");
+                long startTime = Long.parseLong(split[0]);
+                long endTime = Long.parseLong(split[1]);
+                //当前秒杀活动处于有效期内
+                if (currentTime > startTime && currentTime < endTime) {
+                    List<String> range = redisTemplate.opsForList().range(key, -100, 100);
+                    BoundHashOperations<String, Object, Object> ops = redisTemplate.boundHashOps(SECKILL_CHARE_PREFIX);
+                    List<SeckillSkuRedisTo> collect = range.stream().map(s -> {
+                        String json = (String) ops.get(s);
+                        SeckillSkuRedisTo redisTo = JSON.parseObject(json, SeckillSkuRedisTo.class);
+                        return redisTo;
+                    }).collect(Collectors.toList());
+                    return collect;
+                }
             }
+            return null;
+        }catch (BlockException e){
+            log.error("被限流了 SeckillSkus");
         }
         return null;
     }

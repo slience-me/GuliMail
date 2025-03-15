@@ -1,4 +1,20 @@
 spring:
   thymeleaf:
     cache: false
+  jackson:
+    date-format: yyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.50.3:8848
+    sentinel:
+      transport:
+        dashboard: 192.168.50.3:8333
+        port: 8719
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

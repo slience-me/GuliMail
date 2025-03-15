@@ -2,6 +2,7 @@ package cn.slienceme.gulimall.order.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -9,6 +10,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.PostConstruct;
 
@@ -16,8 +18,18 @@ import javax.annotation.PostConstruct;
 @Configuration
 public class MyRabbitConfig {
 
-    @Autowired
     RabbitTemplate rabbitTemplate;
+
+    @Primary
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        this.rabbitTemplate = rabbitTemplate;
+        rabbitTemplate.setMessageConverter(messageConverter());
+        initRabbitTemplate();
+        return rabbitTemplate;
+    }
+
 
     @Bean
     public MessageConverter messageConverter() {
@@ -39,7 +51,7 @@ public class MyRabbitConfig {
      *      3). 如果消息消费失败, 让他重新入队
      *      4). 手动确认代码演示
      */
-    @PostConstruct //  myRabbitConfig对象创建完成后执行这个方法
+    //@PostConstruct //  myRabbitConfig对象创建完成后执行这个方法
     public void initRabbitTemplate() {
         // 设置回调函数
         rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {

@@ -174,7 +174,8 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
                 });
                 long current = System.currentTimeMillis();
                 //如果返回结果不为空且活动未过期，设置秒杀信息
-                if (seckillSkuVo != null&&current<seckillSkuVo.getEndTime()) {
+                if (seckillSkuVo != null && current < seckillSkuVo.getEndTime()) {
+                    System.out.println("秒杀内容 = " + seckillSkuVo.toString());
                     skuItemVo.setSeckillSkuVo(seckillSkuVo);
                 }
             }
@@ -182,6 +183,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
         // 等待所有任务都完成
         CompletableFuture.allOf(saleAttrFuture, descFuture, bashAttrFuture, imagesFuture, seckFuture).get();
+
 
         //TODO 6、秒杀商品的优惠信息
 

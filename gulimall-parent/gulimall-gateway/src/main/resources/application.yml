@@ -1,5 +1,12 @@
 spring:
+  jackson:
+    date-format: yyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
   cloud:
+    sentinel:
+      transport:
+        dashboard: 192.168.50.3:8333
+        port: 8719
     gateway:
       routes:
         - id: product_route
@@ -86,3 +93,10 @@ spring:
           predicates:
             - Host=seckill.gulimall.com
 ## 前端项目 统一带 /api前缀
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

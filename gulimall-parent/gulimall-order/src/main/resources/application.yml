@@ -8,6 +8,11 @@ spring:
     nacos:
       discovery:
         server-addr: 192.168.50.3:8848
+    sentinel:
+      transport:
+        dashboard: 192.168.50.3:8333
+        port: 8719
+
   application:
     name: gulimall-order
   jackson:
@@ -19,6 +24,12 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
 
 server:
   port: 9000

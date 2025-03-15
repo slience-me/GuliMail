@@ -8,6 +8,10 @@ spring:
     nacos:
       discovery:
         server-addr: 192.168.50.3:8848
+    sentinel:
+      transport:
+        dashboard: 192.168.50.3:8333
+        port: 8719
   application:
     name: gulimall-product
   thymeleaf:
@@ -16,7 +20,8 @@ spring:
     host: 192.168.50.2
     port: 6379
   jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
+    date-format: yyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
   cache:
     type: redis
     redis:
@@ -32,6 +37,12 @@ mybatis-plus:
       id-type: auto
       logic-delete-value: 1
       logic-not-delete-value: 0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
 
 server:
   port: 10000

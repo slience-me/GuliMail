@@ -29,7 +29,7 @@ import java.util.Map;
  * */
 
 @Slf4j
-@Controller
+@Controller("/")
 public class OAuth2Controller {
 
     @Autowired

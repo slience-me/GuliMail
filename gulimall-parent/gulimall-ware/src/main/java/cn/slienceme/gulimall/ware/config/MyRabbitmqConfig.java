@@ -1,21 +1,12 @@
 package cn.slienceme.gulimall.ware.config;
 
 import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import java.util.HashMap;
 
 @Configuration
 public class MyRabbitmqConfig {
-
-    @Bean
-    public MessageConverter messageConverter() {
-        //在容器中导入Json的消息转换器
-        return new Jackson2JsonMessageConverter();
-    }
 
     @Bean
     public Exchange stockEventExchange() {

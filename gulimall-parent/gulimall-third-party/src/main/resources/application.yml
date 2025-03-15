@@ -1,8 +1,15 @@
 spring:
+  jackson:
+    date-format: yyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
   cloud:
     nacos:
       discovery:
         server-addr: 192.168.50.3:8848
+    sentinel:
+      transport:
+        dashboard: 192.168.50.3:8333
+        port: 8719
     alicloud:
       access-key:
       secret-key:
@@ -21,6 +28,12 @@ sms:
   appcode:
   sms-sign-id:
   template-id:
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
 
 #alibaba:
 #  cloud:
