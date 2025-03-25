@@ -13,7 +13,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
  * 1、整合Sentinel
  * 1) 引入依赖
  * 2) 下载sentinel控制台
- * 3) 配置 application.yml 配置sentinel控制台地址信息
+ * 3) 配置 application.properties 配置sentinel控制台地址信息
  * 4) 在控制台调整参数【默认所有的设置保存在内存中，重启失效】
  * 2、每一个微服务都导入actuator模块  实时监控模块
  *      配置management:endpoints:web:exposure:include: '*'
