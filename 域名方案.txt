@@ -1,3 +1,4 @@
+# 该内容为hosts配置内容
 192.168.56.10 gulimall.com
 192.168.56.10 search.gulimall.com
 192.168.56.10 item.gulimall.com
